@@ -10,23 +10,52 @@ public class PlayerBehaviour : MonoBehaviour
 
     private Rigidbody2D rb;
     private Collider2D myCollider;
+    private Animator anim;
+
+    [SerializeField]
+    private GameObject colRunning;
+    [SerializeField]
+    private GameObject colSliding;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        myCollider = GetComponent<Collider2D>();
+        myCollider = GetComponentInChildren<Collider2D>();
+        anim = GetComponent<Animator>();
+
+        Initialize();
     }
 
     void Update()
     {
         isGrounded = Physics2D.IsTouchingLayers(myCollider, whatIsGround);
+        anim.SetBool("isGrounded", isGrounded);
 
         if(Input.GetKeyDown(KeyCode.Space))
         {
             if(isGrounded)
             {
+                anim.SetTrigger("isJumping");
                 rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             }
+        }
+
+        if(Input.GetKey(KeyCode.Q))
+        {
+            if(isGrounded)
+            {
+                anim.SetBool("isSliding", true);
+                colRunning.SetActive(false);
+                colSliding.SetActive(true);
+                Debug.Log("AY! I'M SLIDIN' OVAH HERE!");
+            }
+        }
+        else if(Input.GetKeyUp(KeyCode.Q))
+        {
+            anim.SetBool("isSliding", false);
+            colRunning.SetActive(true);
+            colSliding.SetActive(false);
+            Debug.Log("AY!!! I'M RUNNIN OVAH HERE!");
         }
     }
 
@@ -40,4 +69,14 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
+
+    void Initialize()
+    {
+        colRunning.SetActive(true);
+        colSliding.SetActive(false);
+
+        anim.SetBool("isIdle", true);
+        anim.SetBool("isRunning", false);
+        anim.SetBool("isSliding", false);
+    }
 }

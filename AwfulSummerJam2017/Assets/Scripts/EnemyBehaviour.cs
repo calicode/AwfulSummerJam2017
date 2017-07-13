@@ -4,18 +4,31 @@ using UnityEngine;
 
 public class EnemyBehaviour : MonoBehaviour
 {
-    public float speed = 10;
+    public float startSpeed = 10;
+    public bool isActive;
 
+    private float speed;
     private Rigidbody2D rb;
 
     void Start()
     {
+        isActive = false;
+        speed = startSpeed;
         rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
+        if(!isActive)
+        {
+            speed = 0;
+        }
+        else
+        {
+            speed = startSpeed;
+        }
+
         rb.velocity = new Vector2(-speed, rb.velocity.y);
     }
-
+        
 }
