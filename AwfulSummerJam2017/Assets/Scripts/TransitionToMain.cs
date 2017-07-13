@@ -11,17 +11,10 @@ public class TransitionToMain : MonoBehaviour
     {
         levelManager = GameObject.FindObjectOfType<LevelManager>();
 
-        Invoke("LoadMainMenu", 2f);
     }
     void LoadMainMenu()
     {
         levelManager.LoadLevel(mainMenuSceneIndex);
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
 
     }
 }
