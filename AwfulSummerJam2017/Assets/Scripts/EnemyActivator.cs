@@ -12,7 +12,7 @@ public class EnemyActivator : MonoBehaviour
         if(enemy)
         {
             enemy.isActive = true;
-            Debug.Log("Activating Enemy!");
+            Debug.Log("Activating Enemy!"); //remove this before the game is done
         }
     }
 }
