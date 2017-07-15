@@ -8,13 +8,12 @@ public class DrawDropShadow : MonoBehaviour
     float shadowOffsetY;
     Vector3 parentBounds;
     SpriteRenderer spriteRender;
-    LayerMask groundLayer;
+    int groundLayer;
 
     // Use this for initialization
     void Start()
     {
-        groundLayer = LayerMask.NameToLayer("Ground");
-
+        groundLayer = LayerMask.GetMask("Ground");
         spriteRender = GetComponent<SpriteRenderer>();
         UpdateShadowHeight();
     }
@@ -34,10 +33,18 @@ public class DrawDropShadow : MonoBehaviour
         // change this to a raycast to closest solid layer
 
         // call from playerbehavior after jump if grounded and ypos changed much
-        RaycastHit2D hit = Physics2D.Raycast(transform.parent.position, Vector2.down, 15, groundLayer);
-        if (hit) { Debug.Log("Raycast hit below at distance of" + hit.distance); }
+        Debug.DrawRay(transform.parent.position, Vector2.down * 10, Color.red);
+        RaycastHit2D hit = Physics2D.Raycast(transform.parent.position, -Vector2.up, 15, groundLayer);
+        if (hit)
+        {
+
+            Debug.Log("Raycast hit below at distance of" + hit.distance);
+
+
+        }
         parentBounds = transform.parent.GetComponent<Renderer>().bounds.extents;
         shadowOffsetY = -(parentBounds.y * 2);
+        Debug.DrawRay(parentBounds, Vector2.down * 5, Color.blue);
 
     }
 
