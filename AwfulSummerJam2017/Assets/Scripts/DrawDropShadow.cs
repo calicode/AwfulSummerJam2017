@@ -9,51 +9,33 @@ public class DrawDropShadow : MonoBehaviour
     Vector3 parentBounds;
     SpriteRenderer spriteRender;
     int groundLayer;
+    float rayDistance = 10;
 
     // Use this for initialization
     void Start()
     {
         groundLayer = LayerMask.GetMask("Ground");
-        spriteRender = GetComponent<SpriteRenderer>();
-        UpdateShadowHeight();
     }
 
-    public void UpdateShadowSize()
+    public void UpdateShadowHeightAndScale()
     {
-        float scaleChange = (transform.parent.position.y + transform.position.y);
-        // this needs to be modified  so the scaling is less drastic
 
-        //Debug.Log(+scaleChange);
-        transform.localScale = new Vector2(scaleChange, scaleChange);
 
-    }
 
-    public void UpdateShadowHeight()
-    {
-        // change this to a raycast to closest solid layer
+        //        Debug.DrawRay(transform.parent.position, Vector2.down * 5, Color.red);
 
-        // call from playerbehavior after jump if grounded and ypos changed much
-        Debug.DrawRay(transform.parent.position, Vector2.down * 10, Color.red);
-        RaycastHit2D hit = Physics2D.Raycast(transform.parent.position, -Vector2.up, 15, groundLayer);
+        RaycastHit2D hit = Physics2D.Raycast(transform.parent.position, Vector2.down, rayDistance, groundLayer);
         if (hit)
         {
-
-            Debug.Log("Raycast hit below at distance of" + hit.distance);
-
-
+            shadowOffsetY = hit.collider.bounds.max.y;
+            float scaleAmount = 30 / hit.distance; // yay magic numbers
+            transform.localScale = new Vector2(scaleAmount, scaleAmount);
         }
-        parentBounds = transform.parent.GetComponent<Renderer>().bounds.extents;
-        shadowOffsetY = -(parentBounds.y * 2);
-        Debug.DrawRay(parentBounds, Vector2.down * 5, Color.blue);
-
     }
-
 
     void Update()
     {
-        UpdateShadowHeight();
-        UpdateShadowSize();
-
+        UpdateShadowHeightAndScale();
         transform.position = new Vector2(transform.position.x, shadowOffsetY);
     }
 }
