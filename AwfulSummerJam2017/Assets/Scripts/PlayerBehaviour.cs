@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerBehaviour : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class PlayerBehaviour : MonoBehaviour
     private GameObject colSliding;
     [SerializeField]
     private PlatformMover[] startPlatforms;
+    [SerializeField]
+    private Text bottleCountText;
 
     void Start()
     {
@@ -28,6 +31,10 @@ public class PlayerBehaviour : MonoBehaviour
         myCollider = GetComponentInChildren<Collider2D>();
         anim = GetComponent<Animator>();
         startPlatforms = GameObject.FindObjectsOfType<PlatformMover>();
+
+        bottles = startingBottles;
+        UpdateBottleCountDisplay();
+
 
         Initialize(); //Resets animations to Idle and pauses the game until StartGame input
     }
@@ -37,9 +44,9 @@ public class PlayerBehaviour : MonoBehaviour
         isGrounded = Physics2D.IsTouchingLayers(myCollider, whatIsGround);
         anim.SetBool("isGrounded", isGrounded);
 
-        if(!gameStarted)
+        if (!gameStarted)
         {
-            if(Input.GetKeyDown(KeyCode.Return)) //Change keycode to something more appropriate once game is near completion
+            if (Input.GetKeyDown(KeyCode.Return)) //Change keycode to something more appropriate once game is near completion
             {
                 StartRunning();
             }
@@ -56,7 +63,7 @@ public class PlayerBehaviour : MonoBehaviour
     {
         EnemyBehaviour enemy = col.gameObject.GetComponent<EnemyBehaviour>();
 
-        if(enemy)
+        if (enemy)
         {
             Debug.Log("Hells bells! I appear to have been hit by this " + enemy.gameObject); //remove this before the game is done
         }
@@ -68,7 +75,7 @@ public class PlayerBehaviour : MonoBehaviour
         anim.SetBool("isRunning", true);
         gameStarted = true;
 
-        foreach(PlatformMover plats in startPlatforms)
+        foreach (PlatformMover plats in startPlatforms)
         {
             plats.ResumeGame();
         }
@@ -76,9 +83,9 @@ public class PlayerBehaviour : MonoBehaviour
 
     void Slide()
     {
-        if(Input.GetKey(KeyCode.Q))
+        if (Input.GetKey(KeyCode.Q))
         {
-            if(isGrounded)
+            if (isGrounded)
             {
                 anim.SetBool("isSliding", true);
                 colRunning.SetActive(false);
@@ -86,7 +93,7 @@ public class PlayerBehaviour : MonoBehaviour
                 Debug.Log("AY! I'M SLIDIN' OVAH HERE!"); //remove this before the game is done
             }
         }
-        else if(Input.GetKeyUp(KeyCode.Q))
+        else if (Input.GetKeyUp(KeyCode.Q))
         {
             anim.SetBool("isSliding", false);
             colRunning.SetActive(true);
@@ -97,29 +104,48 @@ public class PlayerBehaviour : MonoBehaviour
 
     void Jump()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            if(isGrounded)
+            if (isGrounded)
             {
                 anim.SetTrigger("isJumping");
                 rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                IncreaseBottles(); // just testing
             }
         }
     }
 
     void IncreaseBottles()
     {
-        if(bottles <= 24)
+        if (bottles < 30)
         {
             bottles++;
-            //TODO: modify bottle UI text;
+            UpdateBottleCountDisplay();
         }
-        else if(bottles > 24 && bottles < 30)
+    }
+
+    void UpdateBottleCountDisplay()
+    {
+        if (bottles <= 24)
         {
-            bottles++;
-            //TODO: modify bottle UI text;
-            //TODO: change bottle UI colour to indicate extra bottles;
+
+            bottleCountText.color = Color.black;
         }
+        else if (bottles > 24)
+        {
+            bottleCountText.color = Color.green;
+        }
+
+        /* else if (bottles < minPitStopBottleCount)
+         {
+             // add a visual indicator, maybe text size pulses
+             bottleCountText.color = Color.red;
+
+         }
+ */
+
+        bottleCountText.text = bottles.ToString();
+
     }
 
     void Initialize()
