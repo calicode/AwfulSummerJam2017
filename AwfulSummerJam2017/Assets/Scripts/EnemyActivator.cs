@@ -11,7 +11,7 @@ public class EnemyActivator : MonoBehaviour
 
         if(enemy)
         {
-            enemy.isActive = true;
+            enemy.StartMoving();
             Debug.Log("Activating Enemy!"); //remove this before the game is done
         }
     }

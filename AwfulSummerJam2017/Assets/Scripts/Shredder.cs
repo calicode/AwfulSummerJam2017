@@ -4,8 +4,21 @@ using UnityEngine;
 
 public class Shredder : MonoBehaviour 
 {
+
+    private EnemyBehaviour enemy;
+
     void OnTriggerEnter2D(Collider2D collider)
     {
-        Destroy(collider.transform.parent.gameObject);
+        enemy = collider.gameObject.GetComponent<EnemyBehaviour>();
+
+        if(enemy)
+        {
+            enemy.ResetPosition();    
+        }
+
+        if(collider.tag == "Ground")
+        {
+            collider.transform.parent.gameObject.SetActive(false);
+        }
     }
 }

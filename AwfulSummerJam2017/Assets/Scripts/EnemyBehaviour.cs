@@ -9,12 +9,14 @@ public class EnemyBehaviour : MonoBehaviour
 
     private float speed;
     private Rigidbody2D rb;
+    private Vector3 initialPosition;
 
     void Start()
     {
         isActive = false;
         speed = startSpeed;
         rb = GetComponent<Rigidbody2D>();
+        initialPosition = transform.localPosition;
     }
 
     void Update()
@@ -30,5 +32,20 @@ public class EnemyBehaviour : MonoBehaviour
 
         rb.velocity = new Vector2(-speed, rb.velocity.y);
     }
-        
+
+    public void StartMoving()
+    {
+        isActive = true;
+    }
+
+    public void StopMoving()
+    {
+        isActive = false;
+    }
+       
+    public void ResetPosition()
+    {
+        isActive = false;
+        transform.localPosition = initialPosition;
+    }
 }

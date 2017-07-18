@@ -5,11 +5,14 @@ using UnityEngine;
 public class PlatformMover : MonoBehaviour
 {
     public float startingSpeed = 10f;
+
     private float speed = 0f;
+    private Vector3 initPos;
 
     void Start()
     {
         speed = 0f;
+        initPos = transform.position;
     }
 
     void Update()
@@ -27,4 +30,8 @@ public class PlatformMover : MonoBehaviour
         speed = 0f;
     }
 
+    public void ResetPos()
+    {
+        transform.position = initPos;
+    }
 }
