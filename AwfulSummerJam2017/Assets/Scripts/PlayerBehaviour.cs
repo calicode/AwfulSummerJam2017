@@ -191,7 +191,7 @@ public class PlayerBehaviour : MonoBehaviour
         if (bottles <= 24)
         {
 
-            bottleCountText.color = Color.black;
+            bottleCountText.color = Color.white;
         }
         else if (bottles > 24)
         {

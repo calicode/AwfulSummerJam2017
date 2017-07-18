@@ -19,7 +19,7 @@ public class EnemyBehaviour : MonoBehaviour
         initialPosition = transform.localPosition;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if(!isActive)
         {
