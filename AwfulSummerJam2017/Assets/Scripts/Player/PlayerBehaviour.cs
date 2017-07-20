@@ -8,85 +8,86 @@ public class PlayerBehaviour : MonoBehaviour
 {
     public float jumpForce;
     public bool isGrounded; //public for testing purposes, change to private once done
-    public LayerMask whatIsGround;
-    public int initBottles = 24; //set to private once testing is over
-    public float initBoozeTimer = 5f; //set to private once testing is over
+    public LayerMask whatIsGround; //Checks to see if the Layer is marked "ground"
+    public int initBottles = 24; //set to private once testing is over  //Starting Bottle count
+    public float initBoozeTimer = 5f; //set to private once testing is over  //Starting BoozeTimer
+    public int minBottleReq = 5; //The minimal bottle requirement for the pitstop
 
-    private Vector3 initPos;
-    private float boozeTimer;
-    private int bottles;
-    private Rigidbody2D rb;
-    private Collider2D myCollider;
-    private Animator anim;
-    private bool gameStarted;
-    private bool boozedUp;
-    private bool dead = false;
+    private Vector3 initPos; //Starting Player Position
+    private float boozeTimer; //Current Booze Timer
+    private int bottles; //Current Bottle count
+    private Rigidbody2D rb; //The player's Rigidbody
+    private Collider2D myCollider; //The player's first collider
+    private Animator anim; //The Player's animator
+    private bool gameStarted; //Is the game currently going?
+    private bool boozedUp; //Is the player currently in Booze Power mode?
+    private bool dead = false; //Well pretty self explanatory
 
+    //Bunch of variables I want to see in editor but not change
     [SerializeField]
-    private GameObject colRunning;
+    private GameObject colRunning; //The running collider
     [SerializeField]
-    private GameObject colSliding;
+    private GameObject colSliding; //The sliding collider
     [SerializeField]
-    private GameObject colBoozePower;
+    private GameObject colBoozePower; //The booze power collider
     [SerializeField]
-    private PlatformMover[] startPlatforms;
+    private PlatformMover[] startPlatforms; //All the platforms currently in the scene
     [SerializeField]
-    private Text bottleCountText;
+    private EnemyBehaviour[] enemies; //All the enemies currently in the scene
+    [SerializeField]
+    private Text bottleCountText; //The bottle count text............
 
     void Start()
     {
+        //Yeh git those components
         rb = GetComponent<Rigidbody2D>();
         myCollider = GetComponentInChildren<Collider2D>();
         anim = GetComponent<Animator>();
         startPlatforms = GameObject.FindObjectsOfType<PlatformMover>();
+        enemies = GameObject.FindObjectsOfType<EnemyBehaviour>();
+
+        //Initializes the timer, count and position (Should this be in the Initialize function? TBD)
         boozeTimer = initBoozeTimer;
         bottles = initBottles;
         initPos = transform.position;
 
-        UpdateBottleCountDisplay();
+        UpdateBottleCountDisplay(); //Updates...the Bottle...Count...Display
         Initialize(); //Resets animations to Idle and pauses the game until StartGame input
     }
 
     void Update()
     {
-        isGrounded = Physics2D.IsTouchingLayers(myCollider, whatIsGround);
-        anim.SetBool("isGrounded", isGrounded);
+        isGrounded = Physics2D.IsTouchingLayers(myCollider, whatIsGround); //What is ground????? This checks to see if the player is touching it!
+        anim.SetBool("isGrounded", isGrounded); //Makes sure the animations go back to normal if the player touches the ground
 
-        if (!gameStarted)
+        if (!gameStarted) //Checks to see if the game is set to "pause" mode
         {
             if (Input.GetKeyDown(KeyCode.Return)) //Change keycode to something more appropriate once game is near completion
             {
-                StartRunning();
+                StartRunning(); //Starts the game!
             }
         }
-        else if(dead)
+        else if(dead) //Checks to see if you died a horrible painful death
         {
             if(Input.GetKeyDown(KeyCode.Return))
             {
-                
-                foreach (PlatformMover plats in startPlatforms)
-                {
-                    plats.ResetPos();
-                    plats.gameObject.SetActive(true);
-                }
-                dead = false;
-                Initialize();
-                //TODO: Reset ALL enemy Positions as well;
+                ResetEverything(); //Three guesses as to what this does
             }
         }
-        else
+        else //This should be the default setting, when the game is running
         {
-            Jump();
-            Slide();
-            ActivateBoozePower();
+            Jump(); //Lets you soar through the air without a care in the world
+            Slide(); //Lets you slide real smooth like
+            ActivateBoozePower(); //Activates the wonderful magical power of BOOZE
 
-            if(boozedUp)
+            //The booze power timer
+            if(boozedUp) //Are you drunk?
             {
                 boozeTimer -= Time.deltaTime;
 
                 if(boozeTimer <= 0)
                 {
-                    DeactivateBoozePower();
+                    DeactivateBoozePower(); //You are now sober/sad
                 }
             }
 
@@ -96,7 +97,23 @@ public class PlayerBehaviour : MonoBehaviour
 
     }
 
-    void StartRunning()
+    //This happens when you touch a thing
+    public void Dead()
+    {
+        anim.SetBool("isDead", true);
+        foreach(PlatformMover plats in startPlatforms)
+        {
+            plats.PauseGame();
+        }
+        foreach(EnemyBehaviour bads in enemies)
+        {
+            bads.StopMoving();
+        }
+        dead = true;
+    }
+
+    //This is the function that puts the game in motion
+    void StartRunning() 
     {
         anim.SetBool("isIdle", false);
         anim.SetBool("isRunning", true);
@@ -108,24 +125,18 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
+    //The allmighty collision detector, if you hit something, you are dead!
     void OnCollisionEnter2D(Collision2D col)
     {
         EnemyBehaviour enemy = col.gameObject.GetComponent<EnemyBehaviour>();
 
-        if (enemy)
+        if (enemy) //Makes sure you don't die when you touch the ground
         {
-            anim.SetBool("isDead", true);
-            enemy.StopMoving();
-            foreach (PlatformMover plats in startPlatforms)
-            {
-                plats.PauseGame();
-            }
-            dead = true;
-
-            Debug.Log("Hells bells! I appear to have been hit by this " + enemy.gameObject); //remove this before the game is done
+            Dead();
         }
     }
 
+    //Drink up, be merry, and also invincible for a couple of seconds (pits don't care if you're drunk)
     void ActivateBoozePower()
     {
         if(Input.GetKeyDown(KeyCode.E))
@@ -136,6 +147,7 @@ public class PlayerBehaviour : MonoBehaviour
         //TODO: Need to make a TriggerCollider Script for BoozePower
     }
 
+    //You sober up real quick, and you lose your invincibility
     void DeactivateBoozePower()
     {
         boozedUp = false;
@@ -145,10 +157,28 @@ public class PlayerBehaviour : MonoBehaviour
 
 
 
+    //Puts everything back where it was, all neat and tidy
+    void ResetEverything()
+    {
+        foreach(PlatformMover plats in startPlatforms)
+        {
+            plats.ResetPos();
+            plats.gameObject.SetActive(true);
+        }
+        foreach(EnemyBehaviour bads in enemies)
+        {
+            bads.ResetPosition();
+        }
+        dead = false;
+        Initialize();
+    }
+
+    //Changes the running collider to the slide collider, also makes you look real cool
     void Slide()
     {
         if (Input.GetKey(KeyCode.Q))
         {
+            //You can't slide while jumping, dummy!
             if (isGrounded)
             {
                 anim.SetBool("isSliding", true);
@@ -164,10 +194,12 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
+    //Gets you really high
     void Jump()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            //You can't jump while you're already jumping, dummy!
             if (isGrounded)
             {
                 anim.SetTrigger("isJumping");
@@ -177,6 +209,7 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
+    //Increases your booze count
     void IncreaseBottles()
     {
         if (bottles < 30)
@@ -186,10 +219,16 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
+    //Updates your booze count, white text if in normal range, green if above 24 and red if below...5?
     void UpdateBottleCountDisplay()
     {
         if (bottles <= 24)
         {
+            if(bottles <= minBottleReq)
+            {
+                bottleCountText.color = Color.red;
+                //Add a pulsating thing to the text to INDICATE URGENCY!!!!!
+            }
 
             bottleCountText.color = Color.white;
         }
@@ -198,18 +237,11 @@ public class PlayerBehaviour : MonoBehaviour
             bottleCountText.color = Color.green;
         }
 
-        /* else if (bottles < minPitStopBottleCount)
-         {
-             // add a visual indicator, maybe text size pulses
-             bottleCountText.color = Color.red;
-
-         }
- */
-
         bottleCountText.text = bottles.ToString();
 
     }
 
+    //Sets all the colliders, animations, positions and conditions for the player back to normal.
     void Initialize()
     {
         colRunning.SetActive(true);

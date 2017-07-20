@@ -13,13 +13,12 @@ public class LevelManager : MonoBehaviour
 
     void Awake()
     {
-
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(gameObject); //Makes sure the LevelManager doesn't go anywhere once it's loaded
     }
 
+    //Both these functions loads the level. Overloaded function to make sure we can use indexes or strings
     public void LoadLevel(string levelName)
     {
-
         SceneManager.LoadSceneAsync(levelName);
 
     }

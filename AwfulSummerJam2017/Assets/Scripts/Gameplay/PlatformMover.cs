@@ -4,32 +4,36 @@ using UnityEngine;
 
 public class PlatformMover : MonoBehaviour
 {
-    public float startingSpeed = 10f;
+    public float startingSpeed = 10f; //The platform's starting speed
 
-    private float speed = 0f;
-    private Vector3 initPos;
+    private float speed = 0f; //The platform's current speed
+    private Vector3 initPos; //The platform's initial position
 
     void Start()
     {
+        //Sets all the initial info
         speed = 0f;
         initPos = transform.position;
     }
 
     void FixedUpdate()
     {
-        transform.Translate(Vector3.left * speed * Time.deltaTime);
+        transform.Translate(Vector3.left * speed * Time.deltaTime); //Moves the platform left
     }
 	
+    //Starts moving the platforms
     public void ResumeGame()
     {
         speed = startingSpeed;
     }
 
+    //Pauses the platforms
     public void PauseGame()
     {
         speed = 0f;
     }
 
+    //Resets the Platforms
     public void ResetPos()
     {
         transform.position = initPos;

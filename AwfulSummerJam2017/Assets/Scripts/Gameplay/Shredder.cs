@@ -4,19 +4,25 @@ using UnityEngine;
 
 public class Shredder : MonoBehaviour 
 {
-    private PlatformPooler platPool;
-    private EnemyBehaviour enemy;
+    private PlatformPooler platPool; //The platform pooler, to bring back dead platforms
+    private EnemyBehaviour enemy; //The enemy that touches the shredder
+    private PlayerBehaviour player; //The player, of course
 
+    //DA SHREDDER!!!
     void OnTriggerEnter2D(Collider2D collider)
     {
+        //Grabs the components when touching the shredder
+        player = collider.gameObject.GetComponentInParent<PlayerBehaviour>();
         enemy = collider.gameObject.GetComponent<EnemyBehaviour>();
         platPool = collider.gameObject.GetComponentInParent<PlatformPooler>();
 
+        //If the object is an enemy, reset its position
         if(enemy)
         {
             enemy.ResetPosition();    
         }
 
+        //If the object is the platform's ground, deactivate the entire platform and put it back in the pool
         if(collider.tag == "Ground")
         {
 
@@ -25,9 +31,16 @@ public class Shredder : MonoBehaviour
 
         }
 
+        //If the object is the starting platform, simply deactivate it, THIS PLATFORM DOES NOT GO IN THE POOL!
         if(collider.tag == "StartingPlatform")
         {
             collider.transform.parent.gameObject.SetActive(false); 
+        }
+
+        //If the player falls down, he dies
+        if(player)
+        {
+            player.Dead();
         }
     }
 }
