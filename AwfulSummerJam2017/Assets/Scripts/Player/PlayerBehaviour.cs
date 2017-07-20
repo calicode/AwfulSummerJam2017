@@ -79,6 +79,8 @@ public class PlayerBehaviour : MonoBehaviour
             Jump(); //Lets you soar through the air without a care in the world
             Slide(); //Lets you slide real smooth like
             ActivateBoozePower(); //Activates the wonderful magical power of BOOZE
+            Throw();
+            Punch();
 
             //The booze power timer
             if(boozedUp) //Are you drunk?
@@ -100,6 +102,8 @@ public class PlayerBehaviour : MonoBehaviour
     //This happens when you touch a thing
     public void Dead()
     {
+        //TODO: Needs a condition if you touch an enemy VS when you fall down a pit
+
         anim.SetBool("isDead", true);
         foreach(PlatformMover plats in startPlatforms)
         {
@@ -139,8 +143,10 @@ public class PlayerBehaviour : MonoBehaviour
     //Drink up, be merry, and also invincible for a couple of seconds (pits don't care if you're drunk)
     void ActivateBoozePower()
     {
-        if(Input.GetKeyDown(KeyCode.E))
+        if(Input.GetKeyDown(KeyCode.E) && !boozedUp)
         {
+            bottles -= 5;
+            UpdateBottleCountDisplay();
             boozedUp = true;
             colBoozePower.SetActive(true);
         }
@@ -219,17 +225,49 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
+    //Remove bottles when you're hit
+    void DecreaseBottles()
+    {
+        if(bottles > 0)
+        {
+            bottles -= 5;
+            UpdateBottleCountDisplay();
+        }
+    }
+
+    //Throws a bottle
+    void Throw()
+    {
+        if(Input.GetKeyDown(KeyCode.W)) //Set to something better
+        {
+            anim.SetTrigger("isThrowing");
+            //TODO: Instantiate bottle
+            bottles--;
+            UpdateBottleCountDisplay();
+        }
+
+    }
+
+    //Punchs a human enemy (?)
+    void Punch()
+    {
+        if(Input.GetKeyDown(KeyCode.R)) //Set to something better
+        {
+            anim.SetTrigger("isPunching");
+            //TODO: Make a collider (or use the boozed up collider?) and use it
+        }
+    }
+
     //Updates your booze count, white text if in normal range, green if above 24 and red if below...5?
     void UpdateBottleCountDisplay()
     {
-        if (bottles <= 24)
+        if(bottles <= minBottleReq)
         {
-            if(bottles <= minBottleReq)
-            {
-                bottleCountText.color = Color.red;
-                //Add a pulsating thing to the text to INDICATE URGENCY!!!!!
-            }
-
+            bottleCountText.color = Color.red;
+            //Add a pulsating thing to the text to INDICATE URGENCY!!!!!
+        }
+        else if (bottles <= 24)
+        {
             bottleCountText.color = Color.white;
         }
         else if (bottles > 24)
