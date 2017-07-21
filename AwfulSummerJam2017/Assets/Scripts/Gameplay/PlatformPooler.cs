@@ -88,6 +88,7 @@ public class PlatformPooler : MonoBehaviour {
     void SpawnPitStop(Vector3 pos)
     {
         GameObject pitStop = Instantiate(pitStopPlatform, pos, Quaternion.identity) as GameObject;
+        pitStop.transform.parent = transform;
         lastPlatPos += new Vector3(40, 0, 0);
         platformIndex++;
     }
