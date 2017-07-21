@@ -42,5 +42,11 @@ public class Shredder : MonoBehaviour
         {
             player.Dead();
         }
+
+        //If the platform is a PitStop clone, just delete it, since it's a copy of the one in the pool
+        if(collider.tag == "PitStop")
+        {
+            Destroy(gameObject);
+        }
     }
 }

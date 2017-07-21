@@ -17,11 +17,13 @@ public class PlayerBehaviour : MonoBehaviour
     private float boozeTimer; //Current Booze Timer
     private int bottles; //Current Bottle count
     private Rigidbody2D rb; //The player's Rigidbody
-    private Collider2D myCollider; //The player's first collider
+    [SerializeField]private Collider2D runCollider; //The player's running collider
+    [SerializeField]private Collider2D slideCollider; //the player's slide collider
     private Animator anim; //The Player's animator
     private bool gameStarted; //Is the game currently going?
     private bool boozedUp; //Is the player currently in Booze Power mode?
     private bool dead = false; //Well pretty self explanatory
+    private bool isSliding = false;
 
     //Bunch of variables I want to see in editor but not change
     [SerializeField]
@@ -41,7 +43,8 @@ public class PlayerBehaviour : MonoBehaviour
     {
         //Yeh git those components
         rb = GetComponent<Rigidbody2D>();
-        myCollider = GetComponentInChildren<Collider2D>();
+        runCollider = colRunning.GetComponent<Collider2D>();
+        slideCollider = colSliding.GetComponent<Collider2D>();
         anim = GetComponent<Animator>();
         startPlatforms = GameObject.FindObjectsOfType<PlatformMover>();
         enemies = GameObject.FindObjectsOfType<EnemyBehaviour>();
@@ -57,7 +60,15 @@ public class PlayerBehaviour : MonoBehaviour
 
     void Update()
     {
-        isGrounded = Physics2D.IsTouchingLayers(myCollider, whatIsGround); //What is ground????? This checks to see if the player is touching it!
+        //What is ground????? This checks to see if the player is touching it!    
+        if(!isSliding)
+        {
+            isGrounded = Physics2D.IsTouchingLayers(runCollider, whatIsGround);         }
+        else
+        {
+            isGrounded = Physics2D.IsTouchingLayers(slideCollider, whatIsGround);
+        }
+
         anim.SetBool("isGrounded", isGrounded); //Makes sure the animations go back to normal if the player touches the ground
 
         if (!gameStarted) //Checks to see if the game is set to "pause" mode
@@ -114,6 +125,7 @@ public class PlayerBehaviour : MonoBehaviour
             bads.StopMoving();
         }
         dead = true;
+        isSliding = false;
     }
 
     //This is the function that puts the game in motion
@@ -182,21 +194,19 @@ public class PlayerBehaviour : MonoBehaviour
     //Changes the running collider to the slide collider, also makes you look real cool
     void Slide()
     {
-        if (Input.GetKey(KeyCode.Q))
+        if(Input.GetKey(KeyCode.Q))
         {
-            //You can't slide while jumping, dummy!
-            if (isGrounded)
-            {
-                anim.SetBool("isSliding", true);
-                colRunning.SetActive(false);
-                colSliding.SetActive(true);
-            }
+            anim.SetBool("isSliding", true);
+            colRunning.SetActive(false);
+            colSliding.SetActive(true);
+            isSliding = true;    
         }
         else if (Input.GetKeyUp(KeyCode.Q))
         {
             anim.SetBool("isSliding", false);
             colRunning.SetActive(true);
             colSliding.SetActive(false);
+            isSliding = false;
         }
     }
 
