@@ -50,9 +50,12 @@ public class MusicManager : MonoBehaviour
 
         if (clip)
         {
+            if (audioSource.isPlaying && clip.name == audioSource.clip.name) { return; } // if its the same song don't start playing it again. This is so title screen music transitions to first level without interruption. 
+
             audioSource.clip = clip;
             audioSource.PlayDelayed(1f);
             audioSource.loop = true;
+
         }
         else { Debug.Log("No clip in MusicManager's musicArray for this scene. Add clip or just ignore this"); }
 
