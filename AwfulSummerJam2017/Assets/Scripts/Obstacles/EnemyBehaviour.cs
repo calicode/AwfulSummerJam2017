@@ -7,11 +7,11 @@ public class EnemyBehaviour : MonoBehaviour
     public float startSpeed = 10; //Initial speed of the enemy, set to 0 for stationary baddies
     public bool isActive; //Is the enemy active? Not applicaple to stationary baddies (they don't actually care)
 
-    private float speed; //Current speed of the enemy
-    private Rigidbody2D rb; //The enemy's rigidbody
-    private Vector3 initialPosition; //The enemy's starting position
+    protected float speed; //Current speed of the enemy
+    protected Rigidbody2D rb; //The enemy's rigidbody
+    protected Vector3 initialPosition; //The enemy's starting position
 
-    void Start()
+    protected virtual void Start()
     {
         //Makes sure the enemy is in position and waiting for the player
         isActive = false;
@@ -48,7 +48,7 @@ public class EnemyBehaviour : MonoBehaviour
     }
 
     //Resets the enemy position and deactivates it
-    public void ResetPosition()
+    public virtual void ResetPosition()
     {
         StopMoving();
         transform.localPosition = initialPosition;

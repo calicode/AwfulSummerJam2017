@@ -8,11 +8,16 @@ public class EnemyActivator : MonoBehaviour
     void OnTriggerEnter2D(Collider2D col)
     {
         EnemyBehaviour enemy = col.gameObject.GetComponent<EnemyBehaviour>();
+        ShooterBehaviour shooter = col.gameObject.GetComponent<ShooterBehaviour>();
 
         if(enemy)
         {
             enemy.StartMoving();
-            Debug.Log("Activating Enemy!"); //remove this before the game is done
+        }
+
+        if(shooter)
+        {
+            shooter.Shoot();
         }
     }
 }

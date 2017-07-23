@@ -24,14 +24,21 @@ public class PlayerBehaviour : MonoBehaviour
     private bool boozedUp; //Is the player currently in Booze Power mode?
     private bool dead = false; //Well pretty self explanatory
     private bool isSliding = false;
+    private bool readyThrow = true;
 
     //Bunch of variables I want to see in editor but not change
+    [SerializeField]
+    private GameObject bottleThrown;
+    [SerializeField]
+    private Transform throwingArm;
     [SerializeField]
     private GameObject colRunning; //The running collider
     [SerializeField]
     private GameObject colSliding; //The sliding collider
     [SerializeField]
     private GameObject colBoozePower; //The booze power collider
+    [SerializeField]
+    private GameObject colPunch;
     [SerializeField]
     private PlatformMover[] startPlatforms; //All the platforms currently in the scene
     [SerializeField]
@@ -107,15 +114,18 @@ public class PlayerBehaviour : MonoBehaviour
 
         }
 
+    }
 
+    IEnumerator ResetThrow()
+    {
+        yield return new WaitForSeconds(1f);
 
+        readyThrow = true;
     }
 
     //This happens when you touch a thing
     public void Dead()
     {
-        //TODO: Needs a condition if you touch an enemy VS when you fall down a pit
-
         anim.SetBool("isDead", true);
         foreach (PlatformMover plats in startPlatforms)
         {
@@ -127,6 +137,17 @@ public class PlayerBehaviour : MonoBehaviour
         }
         dead = true;
         isSliding = false;
+        DecreaseBottles();
+    }
+
+    public void PunchEventStart()
+    {
+        colPunch.SetActive(true);
+    }
+
+    public void PunchEventEnd()
+    {
+        colPunch.SetActive(false);
     }
 
     //This is the function that puts the game in motion
@@ -146,24 +167,55 @@ public class PlayerBehaviour : MonoBehaviour
     void OnCollisionEnter2D(Collision2D col)
     {
         EnemyBehaviour enemy = col.gameObject.GetComponent<EnemyBehaviour>();
+        ShooterBehaviour shooter = col.gameObject.GetComponent<ShooterBehaviour>();
+        BulletBehaviour bullet = col.gameObject.GetComponent<BulletBehaviour>();
 
-        if (enemy) //Makes sure you don't die when you touch the ground
+        if (enemy || shooter || bullet) //Makes sure you don't die when you touch the ground
         {
             Dead();
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D collider)
+    {
+        EnemyBehaviour enemy = collider.gameObject.GetComponent<EnemyBehaviour>();
+        ShooterBehaviour shooter = collider.gameObject.GetComponent<ShooterBehaviour>();
+        BulletBehaviour bullet = collider.gameObject.GetComponent<BulletBehaviour>();
+
+        if ((enemy || bullet || shooter) && boozedUp) //Destroys ALL obstacles if you're boozed up
+        {
+            collider.gameObject.SetActive(false);
+        }
+        else if(shooter && !boozedUp) //Destroys only shooters when punching
+        {
+            collider.gameObject.SetActive(false);
+        }
+
+        if(collider.tag == "PitStop")
+        {
+            Debug.Log("Crossing PitStop");
+        }
+
+        if(collider.tag == "Booze")
+        {
+            Debug.Log("got some booze!");
         }
     }
 
     //Drink up, be merry, and also invincible for a couple of seconds (pits don't care if you're drunk)
     void ActivateBoozePower()
     {
-        if (Input.GetKeyDown(KeyCode.E) && !boozedUp)
+        if (Input.GetKeyDown(KeyCode.E) && !boozedUp && bottles >= 5)
         {
             bottles -= 5;
             UpdateBottleCountDisplay();
             boozedUp = true;
             colBoozePower.SetActive(true);
         }
-        //TODO: Need to make a TriggerCollider Script for BoozePower
+        else if(bottles < 5)
+        {
+            Debug.Log("Not enough booze!!");
+        }
     }
 
     //You sober up real quick, and you lose your invincibility
@@ -173,8 +225,6 @@ public class PlayerBehaviour : MonoBehaviour
         colBoozePower.SetActive(false);
         boozeTimer = initBoozeTimer;
     }
-
-
 
     //Puts everything back where it was, all neat and tidy
     void ResetEverything()
@@ -187,7 +237,9 @@ public class PlayerBehaviour : MonoBehaviour
         foreach (EnemyBehaviour bads in enemies)
         {
             bads.ResetPosition();
+            bads.gameObject.SetActive(true);
         }
+
         dead = false;
         Initialize();
     }
@@ -251,10 +303,23 @@ public class PlayerBehaviour : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.W)) //Set to something better
         {
-            anim.SetTrigger("isThrowing");
-            //TODO: Instantiate bottle
-            bottles--;
-            UpdateBottleCountDisplay();
+            if(!isSliding && readyThrow)
+            {
+                if(bottles > 0)
+                {
+                    anim.SetTrigger("isThrowing");
+                    GameObject bottleProj = Instantiate(bottleThrown, throwingArm.position, Quaternion.identity) as GameObject;
+                    bottles--;
+                    UpdateBottleCountDisplay();
+                    readyThrow = false;
+                    Destroy(bottleProj, 3f);
+                    StartCoroutine(ResetThrow());
+                }
+                else
+                {
+                    Debug.Log("No more bottles!");
+                }
+            }
         }
 
     }
@@ -296,6 +361,7 @@ public class PlayerBehaviour : MonoBehaviour
         colRunning.SetActive(true);
         colBoozePower.SetActive(false);
         colSliding.SetActive(false);
+        colPunch.SetActive(false);
         gameStarted = false;
         boozedUp = false;
         dead = false;
