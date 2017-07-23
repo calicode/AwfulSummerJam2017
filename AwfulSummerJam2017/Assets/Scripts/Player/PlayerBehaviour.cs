@@ -17,8 +17,8 @@ public class PlayerBehaviour : MonoBehaviour
     private float boozeTimer; //Current Booze Timer
     private int bottles; //Current Bottle count
     private Rigidbody2D rb; //The player's Rigidbody
-    [SerializeField]private Collider2D runCollider; //The player's running collider
-    [SerializeField]private Collider2D slideCollider; //the player's slide collider
+    [SerializeField] private Collider2D runCollider; //The player's running collider
+    [SerializeField] private Collider2D slideCollider; //the player's slide collider
     private Animator anim; //The Player's animator
     private bool gameStarted; //Is the game currently going?
     private bool boozedUp; //Is the player currently in Booze Power mode?
@@ -61,9 +61,10 @@ public class PlayerBehaviour : MonoBehaviour
     void Update()
     {
         //What is ground????? This checks to see if the player is touching it!    
-        if(!isSliding)
+        if (!isSliding)
         {
-            isGrounded = Physics2D.IsTouchingLayers(runCollider, whatIsGround);         }
+            isGrounded = Physics2D.IsTouchingLayers(runCollider, whatIsGround);
+        }
         else
         {
             isGrounded = Physics2D.IsTouchingLayers(slideCollider, whatIsGround);
@@ -78,9 +79,9 @@ public class PlayerBehaviour : MonoBehaviour
                 StartRunning(); //Starts the game!
             }
         }
-        else if(dead) //Checks to see if you died a horrible painful death
+        else if (dead) //Checks to see if you died a horrible painful death
         {
-            if(Input.GetKeyDown(KeyCode.Return))
+            if (Input.GetKeyDown(KeyCode.Return))
             {
                 ResetEverything(); //Three guesses as to what this does
             }
@@ -94,11 +95,11 @@ public class PlayerBehaviour : MonoBehaviour
             Punch();
 
             //The booze power timer
-            if(boozedUp) //Are you drunk?
+            if (boozedUp) //Are you drunk?
             {
                 boozeTimer -= Time.deltaTime;
 
-                if(boozeTimer <= 0)
+                if (boozeTimer <= 0)
                 {
                     DeactivateBoozePower(); //You are now sober/sad
                 }
@@ -116,11 +117,11 @@ public class PlayerBehaviour : MonoBehaviour
         //TODO: Needs a condition if you touch an enemy VS when you fall down a pit
 
         anim.SetBool("isDead", true);
-        foreach(PlatformMover plats in startPlatforms)
+        foreach (PlatformMover plats in startPlatforms)
         {
             plats.PauseGame();
         }
-        foreach(EnemyBehaviour bads in enemies)
+        foreach (EnemyBehaviour bads in enemies)
         {
             bads.StopMoving();
         }
@@ -129,7 +130,7 @@ public class PlayerBehaviour : MonoBehaviour
     }
 
     //This is the function that puts the game in motion
-    void StartRunning() 
+    void StartRunning()
     {
         anim.SetBool("isIdle", false);
         anim.SetBool("isRunning", true);
@@ -155,7 +156,7 @@ public class PlayerBehaviour : MonoBehaviour
     //Drink up, be merry, and also invincible for a couple of seconds (pits don't care if you're drunk)
     void ActivateBoozePower()
     {
-        if(Input.GetKeyDown(KeyCode.E) && !boozedUp)
+        if (Input.GetKeyDown(KeyCode.E) && !boozedUp)
         {
             bottles -= 5;
             UpdateBottleCountDisplay();
@@ -178,12 +179,12 @@ public class PlayerBehaviour : MonoBehaviour
     //Puts everything back where it was, all neat and tidy
     void ResetEverything()
     {
-        foreach(PlatformMover plats in startPlatforms)
+        foreach (PlatformMover plats in startPlatforms)
         {
             plats.ResetPos();
             plats.gameObject.SetActive(true);
         }
-        foreach(EnemyBehaviour bads in enemies)
+        foreach (EnemyBehaviour bads in enemies)
         {
             bads.ResetPosition();
         }
@@ -194,12 +195,12 @@ public class PlayerBehaviour : MonoBehaviour
     //Changes the running collider to the slide collider, also makes you look real cool
     void Slide()
     {
-        if(Input.GetKey(KeyCode.Q))
+        if (Input.GetKey(KeyCode.Q))
         {
             anim.SetBool("isSliding", true);
             colRunning.SetActive(false);
             colSliding.SetActive(true);
-            isSliding = true;    
+            isSliding = true;
         }
         else if (Input.GetKeyUp(KeyCode.Q))
         {
@@ -238,7 +239,7 @@ public class PlayerBehaviour : MonoBehaviour
     //Remove bottles when you're hit
     void DecreaseBottles()
     {
-        if(bottles > 0)
+        if (bottles > 0)
         {
             bottles -= 5;
             UpdateBottleCountDisplay();
@@ -248,7 +249,7 @@ public class PlayerBehaviour : MonoBehaviour
     //Throws a bottle
     void Throw()
     {
-        if(Input.GetKeyDown(KeyCode.W)) //Set to something better
+        if (Input.GetKeyDown(KeyCode.W)) //Set to something better
         {
             anim.SetTrigger("isThrowing");
             //TODO: Instantiate bottle
@@ -261,7 +262,7 @@ public class PlayerBehaviour : MonoBehaviour
     //Punchs a human enemy (?)
     void Punch()
     {
-        if(Input.GetKeyDown(KeyCode.R)) //Set to something better
+        if (Input.GetKeyDown(KeyCode.R)) //Set to something better
         {
             anim.SetTrigger("isPunching");
             //TODO: Make a collider (or use the boozed up collider?) and use it
@@ -271,7 +272,7 @@ public class PlayerBehaviour : MonoBehaviour
     //Updates your booze count, white text if in normal range, green if above 24 and red if below...5?
     void UpdateBottleCountDisplay()
     {
-        if(bottles <= minBottleReq)
+        if (bottles <= minBottleReq)
         {
             bottleCountText.color = Color.red;
             //Add a pulsating thing to the text to INDICATE URGENCY!!!!!
