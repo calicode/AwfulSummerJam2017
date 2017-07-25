@@ -6,11 +6,12 @@ public class PlatformPooler : MonoBehaviour {
 
     public int NumPlatsPerSection = 5; //Number of platforms per section
     public GameObject pitStopPlatform; //The pitstop Platform
+    public GameObject endPlatform;
     public List<GameObject> platforms; //The big ol' list o' platforms
 
     private int platformIndex; //An incrementing number for platforms
     private Vector3 lastPlatPos; //The position of the last platform spawned
-    private int sectionsNum = 3; //Number of sections per level
+    private int sectionsNum = 2; //Number of sections per level
     private Vector3 initPos; //The platform's initial position
 
     void Awake()
@@ -33,19 +34,23 @@ public class PlatformPooler : MonoBehaviour {
             plat.transform.position = initPos;
         }
            
-        //Places all the platforms in the pool, making sure they are separated by pitstops
+        //There's gotta be a better way to write all this but whatever...spawns a set of platforms for the levely
+        SpawnPlatforms();
+
         while(sectionsNum > 0)
         {
+            SpawnPitStop(lastPlatPos);
             SpawnPlatforms();
             sectionsNum--;
         }
+
     }
 
     //Picks a number at random and returns the platform with that index number, then removes it from the list
     GameObject PickRandomPlatform()
     {
         int randoNum = Random.Range(0, platforms.Count);
-        if(platforms[randoNum].tag != "PitStop") //Makes sure it doesn't add a pitstop to the randomized platforms
+        if(platforms[randoNum].tag != "PitStopPlatform") //Makes sure it doesn't add a pitstop to the randomized platforms
         {
             GameObject platPicked = platforms[randoNum];
             platforms.RemoveAt(randoNum);
@@ -67,7 +72,7 @@ public class PlatformPooler : MonoBehaviour {
             currentPlatform = PickRandomPlatform();
 
             //If the randompicker returns nothing (aka a pitstop), it'll skip it and try again
-            if(currentPlatform != null) 
+            if(currentPlatform != null)
             {
                 currentPlatform.SetActive(true); //Turns on the platforms
                 currentPlatform.transform.position += new Vector3(40 * platformIndex, 0, 0); //Makes sure the platforms don't stack on one another
@@ -80,7 +85,6 @@ public class PlatformPooler : MonoBehaviour {
             }
         }
         lastPlatPos += new Vector3(40, 0, 0); //Moves the position of the last platform to prevent platforms overlapping with the pitstop
-        SpawnPitStop(lastPlatPos); //Spawns a pit stop after a section is placed in the game scene
 
     }
 

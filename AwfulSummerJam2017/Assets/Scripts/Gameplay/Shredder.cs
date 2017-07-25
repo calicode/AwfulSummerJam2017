@@ -44,7 +44,7 @@ public class Shredder : MonoBehaviour
         }
 
         //If the platform is a PitStop clone, just delete it, since it's a copy of the one in the pool
-        if(collider.tag == "PitStop")
+        if(collider.tag == "PitStopPlatform")
         {
             collider.transform.parent.gameObject.SetActive(false);
         }

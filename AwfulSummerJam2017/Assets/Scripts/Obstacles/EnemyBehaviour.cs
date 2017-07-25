@@ -53,4 +53,14 @@ public class EnemyBehaviour : MonoBehaviour
         StopMoving();
         transform.localPosition = initialPosition;
     }
+
+    public virtual Vector3 GetPosition()
+    {
+        return transform.localPosition;
+    }
+
+    public virtual void SetPosition(Vector3 pos)
+    {
+        initialPosition = pos;
+    }
 }

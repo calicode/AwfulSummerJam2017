@@ -11,9 +11,9 @@ public class PlayerBehaviour : MonoBehaviour
     public LayerMask whatIsGround; //Checks to see if the Layer is marked "ground"
     public int initBottles = 24; //set to private once testing is over  //Starting Bottle count
     public float initBoozeTimer = 5f; //set to private once testing is over  //Starting BoozeTimer
-    public int minBottleReq = 5; //The minimal bottle requirement for the pitstop
+    public int minBottleReq = 10; //The minimal bottle requirement for the pitstop
 
-    private Vector3 initPos; //Starting Player Position
+    private Vector3 initPos; //Starting or checkpoint Player Position
     private float boozeTimer; //Current Booze Timer
     private int bottles; //Current Bottle count
     private Rigidbody2D rb; //The player's Rigidbody
@@ -24,7 +24,9 @@ public class PlayerBehaviour : MonoBehaviour
     private bool boozedUp; //Is the player currently in Booze Power mode?
     private bool dead = false; //Well pretty self explanatory
     private bool isSliding = false;
+    private bool isPunching = false;
     private bool readyThrow = true;
+    private bool pitStopTouched = false;
 
     //Bunch of variables I want to see in editor but not change
     [SerializeField]
@@ -143,11 +145,13 @@ public class PlayerBehaviour : MonoBehaviour
     public void PunchEventStart()
     {
         colPunch.SetActive(true);
+        isPunching = true;
     }
 
     public void PunchEventEnd()
     {
         colPunch.SetActive(false);
+        isPunching = false;
     }
 
     //This is the function that puts the game in motion
@@ -186,14 +190,17 @@ public class PlayerBehaviour : MonoBehaviour
         {
             collider.gameObject.SetActive(false);
         }
-        else if(shooter && !boozedUp) //Destroys only shooters when punching
+        else if(shooter && !boozedUp && isPunching) //Destroys only shooters when punching
         {
             collider.gameObject.SetActive(false);
         }
 
         if(collider.tag == "PitStop")
         {
-            Debug.Log("Crossing PitStop");
+            Debug.Log("Crossed the pitstop");
+/*            initPos = transform.position;*/
+
+            SetCheckPoint();
         }
 
         if(collider.tag == "Booze")
@@ -202,19 +209,30 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
+    void OnTriggerExit2D(Collider2D collider)
+    {
+        if(pitStopTouched)
+        {
+            pitStopTouched = false;
+        }
+    }
+
     //Drink up, be merry, and also invincible for a couple of seconds (pits don't care if you're drunk)
     void ActivateBoozePower()
     {
-        if (Input.GetKeyDown(KeyCode.E) && !boozedUp && bottles >= 5)
+        if(Input.GetKeyDown(KeyCode.E))
         {
-            bottles -= 5;
-            UpdateBottleCountDisplay();
-            boozedUp = true;
-            colBoozePower.SetActive(true);
-        }
-        else if(bottles < 5)
-        {
-            Debug.Log("Not enough booze!!");
+            if(!boozedUp && bottles >= 5)
+            {
+                bottles -= 5;
+                UpdateBottleCountDisplay();
+                boozedUp = true;
+                colBoozePower.SetActive(true);
+            }
+            else if(bottles < 5)
+            {
+                Debug.Log("Not enough booze!!");
+            }
         }
     }
 
@@ -291,9 +309,14 @@ public class PlayerBehaviour : MonoBehaviour
     //Remove bottles when you're hit
     void DecreaseBottles()
     {
-        if (bottles > 0)
+        if (bottles >= 5)
         {
             bottles -= 5;
+            UpdateBottleCountDisplay();
+        }
+        else
+        {
+            bottles = 0;
             UpdateBottleCountDisplay();
         }
     }
@@ -353,6 +376,36 @@ public class PlayerBehaviour : MonoBehaviour
 
         bottleCountText.text = bottles.ToString();
 
+    }
+
+    void SetCheckPoint()
+    {
+        if(!pitStopTouched)
+        {
+            pitStopTouched = true;
+
+            if(bottles >= 10)
+            {
+                foreach(PlatformMover plats in startPlatforms)
+                {
+                    Vector3 newPos = plats.GetPlatPosition();
+                    plats.SetPlatPosition(newPos - new Vector3(10, 0, 0));
+                }
+                foreach(EnemyBehaviour bads in enemies)
+                {
+                    Vector3 newPos = bads.GetPosition();
+                    bads.SetPosition(newPos);
+                }
+                bottles -= minBottleReq;
+                UpdateBottleCountDisplay();
+                Debug.Log("Reduced Bottles by " + minBottleReq);
+
+            }
+            else
+            {
+                Debug.Log("Not enough bottles for this checkpoint!");
+            }
+        }
     }
 
     //Sets all the colliders, animations, positions and conditions for the player back to normal.

@@ -38,4 +38,14 @@ public class PlatformMover : MonoBehaviour
     {
         transform.position = initPos;
     }
+
+    public Vector3 GetPlatPosition()
+    {
+        return transform.position;
+    }
+
+    public void SetPlatPosition(Vector3 pos)
+    {
+        initPos = pos;
+    }
 }
