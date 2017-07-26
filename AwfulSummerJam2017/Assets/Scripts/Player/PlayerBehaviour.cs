@@ -46,6 +46,8 @@ public class PlayerBehaviour : MonoBehaviour
     [SerializeField]
     private EnemyBehaviour[] enemies; //All the enemies currently in the scene
     [SerializeField]
+    private BottlePickup[] bottleCollectibles;
+    [SerializeField]
     private Text bottleCountText; //The bottle count text............
 
     void Start()
@@ -57,6 +59,7 @@ public class PlayerBehaviour : MonoBehaviour
         anim = GetComponent<Animator>();
         startPlatforms = GameObject.FindObjectsOfType<PlatformMover>();
         enemies = GameObject.FindObjectsOfType<EnemyBehaviour>();
+        bottleCollectibles = GameObject.FindObjectsOfType<BottlePickup>();
 
         //Initializes the timer, count and position (Should this be in the Initialize function? TBD)
         boozeTimer = initBoozeTimer;
@@ -128,18 +131,21 @@ public class PlayerBehaviour : MonoBehaviour
     //This happens when you touch a thing
     public void Dead()
     {
-        anim.SetBool("isDead", true);
-        foreach (PlatformMover plats in startPlatforms)
+        if(!dead)
         {
-            plats.PauseGame();
+            anim.SetBool("isDead", true);
+            foreach(PlatformMover plats in startPlatforms)
+            {
+                plats.PauseGame();
+            }
+            foreach(EnemyBehaviour bads in enemies)
+            {
+                bads.StopMoving();
+            }
+            dead = true;
+            isSliding = false;
+            DecreaseBottles();
         }
-        foreach (EnemyBehaviour bads in enemies)
-        {
-            bads.StopMoving();
-        }
-        dead = true;
-        isSliding = false;
-        DecreaseBottles();
     }
 
     public void PunchEventStart()
@@ -197,15 +203,13 @@ public class PlayerBehaviour : MonoBehaviour
 
         if(collider.tag == "PitStop")
         {
-            Debug.Log("Crossed the pitstop");
-/*            initPos = transform.position;*/
-
             SetCheckPoint();
         }
 
         if(collider.tag == "Booze")
         {
-            Debug.Log("got some booze!");
+            IncreaseBottles();
+            collider.gameObject.SetActive(false);
         }
     }
 
@@ -258,6 +262,11 @@ public class PlayerBehaviour : MonoBehaviour
             bads.gameObject.SetActive(true);
         }
 
+        foreach(BottlePickup collBottles in bottleCollectibles)
+        {
+            collBottles.gameObject.SetActive(true);
+        }
+
         dead = false;
         Initialize();
     }
@@ -291,7 +300,7 @@ public class PlayerBehaviour : MonoBehaviour
             {
                 anim.SetTrigger("isJumping");
                 rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-                IncreaseBottles(); // just testing
+/*                IncreaseBottles(); // just testing*/
             }
         }
     }
@@ -389,7 +398,7 @@ public class PlayerBehaviour : MonoBehaviour
                 foreach(PlatformMover plats in startPlatforms)
                 {
                     Vector3 newPos = plats.GetPlatPosition();
-                    plats.SetPlatPosition(newPos - new Vector3(10, 0, 0));
+                    plats.SetPlatPosition(newPos - new Vector3(7, 0, 0));
                 }
                 foreach(EnemyBehaviour bads in enemies)
                 {
