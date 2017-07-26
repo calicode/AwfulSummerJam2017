@@ -34,15 +34,17 @@ public class PlatformPooler : MonoBehaviour {
             plat.transform.position = initPos;
         }
            
-        //There's gotta be a better way to write all this but whatever...spawns a set of platforms for the levely
+        //There's gotta be a better way to write all this but whatever...spawns a set of platforms for the level
         SpawnPlatforms();
 
         while(sectionsNum > 0)
         {
-            SpawnPitStop(lastPlatPos);
+            SpawnSpecialPlatform(lastPlatPos, pitStopPlatform);
             SpawnPlatforms();
             sectionsNum--;
         }
+
+        SpawnSpecialPlatform(lastPlatPos, endPlatform);
 
     }
 
@@ -88,11 +90,12 @@ public class PlatformPooler : MonoBehaviour {
 
     }
 
-    //Spawns a pitstop at the position next to the last platform, then increases the platform index (The pitstop is a platform after all!)
-    void SpawnPitStop(Vector3 pos)
+    //Spawns a special platform (pitstop or endplatform) after the last platform
+
+    void SpawnSpecialPlatform(Vector3 pos, GameObject plat)
     {
-        GameObject pitStop = Instantiate(pitStopPlatform, pos, Quaternion.identity) as GameObject;
-        pitStop.transform.parent = transform;
+        GameObject specialPlat = Instantiate(plat, pos, Quaternion.identity) as GameObject;
+        specialPlat.transform.parent = transform;
         lastPlatPos += new Vector3(40, 0, 0);
         platformIndex++;
     }
