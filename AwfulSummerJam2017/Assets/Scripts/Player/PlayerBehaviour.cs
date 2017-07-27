@@ -49,6 +49,8 @@ public class PlayerBehaviour : MonoBehaviour
     private BottlePickup[] bottleCollectibles;
     [SerializeField]
     private Text bottleCountText; //The bottle count text............
+    [SerializeField]
+    private ParticleSystem killParticles;
 
     void Start()
     {
@@ -86,14 +88,14 @@ public class PlayerBehaviour : MonoBehaviour
 
         if (!gameStarted) //Checks to see if the game is set to "pause" mode
         {
-            if (Input.GetKeyDown(KeyCode.Return)) //Change keycode to something more appropriate once game is near completion
+            if (Input.GetKeyDown(KeyCode.Space)) //Change keycode to something more appropriate once game is near completion
             {
                 StartRunning(); //Starts the game!
             }
         }
         else if (dead) //Checks to see if you died a horrible painful death
         {
-            if (Input.GetKeyDown(KeyCode.Return))
+            if (Input.GetKeyDown(KeyCode.Space))
             {
                 ResetEverything(); //Three guesses as to what this does
             }
@@ -195,11 +197,24 @@ public class PlayerBehaviour : MonoBehaviour
 
         if ((enemy || bullet || shooter) && boozedUp) //Destroys ALL obstacles if you're boozed up
         {
+            if(enemy)
+            {
+                enemy.DeathAnim();
+            }
+            else if(shooter)
+            {
+                shooter.DeathAnim();
+            }
+
             collider.gameObject.SetActive(false);
+
+
         }
         else if(shooter && !boozedUp && isPunching) //Destroys only shooters when punching
         {
+            shooter.DeathAnim();
             collider.gameObject.SetActive(false);
+
         }
 
         if(collider.tag == "PitStop") //Sets the checkpoint if a pitstop is touched
@@ -247,7 +262,7 @@ public class PlayerBehaviour : MonoBehaviour
     //Drink up, be merry, and also invincible for a couple of seconds (pits don't care if you're drunk)
     void ActivateBoozePower()
     {
-        if(Input.GetKeyDown(KeyCode.E))
+        if(Input.GetButtonDown("BoozeUp"))
         {
             if(!boozedUp && bottles >= 5)
             {
@@ -297,14 +312,14 @@ public class PlayerBehaviour : MonoBehaviour
     //Changes the running collider to the slide collider, also makes you look real cool
     void Slide()
     {
-        if (Input.GetKey(KeyCode.Q))
+        if (Input.GetButton("Slide"))
         {
             anim.SetBool("isSliding", true);
             colRunning.SetActive(false);
             colSliding.SetActive(true);
             isSliding = true;
         }
-        else if (Input.GetKeyUp(KeyCode.Q))
+        else if (Input.GetButtonUp("Slide"))
         {
             anim.SetBool("isSliding", false);
             colRunning.SetActive(true);
@@ -316,7 +331,7 @@ public class PlayerBehaviour : MonoBehaviour
     //Gets you really high
     void Jump()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetButtonDown("Jump"))
         {
             //You can't jump while you're already jumping, dummy!
             if (isGrounded)
@@ -355,7 +370,7 @@ public class PlayerBehaviour : MonoBehaviour
     //Throws a bottle
     void Throw()
     {
-        if (Input.GetKeyDown(KeyCode.W)) //Set to something better
+        if (Input.GetButtonDown("Throw")) //Set to something better
         {
             if(!isSliding && readyThrow)
             {
@@ -381,7 +396,7 @@ public class PlayerBehaviour : MonoBehaviour
     //Punchs a human enemy (?)
     void Punch()
     {
-        if (Input.GetKeyDown(KeyCode.R)) //Set to something better
+        if (Input.GetButtonDown("Punch")) //Set to something better
         {
             anim.SetTrigger("isPunching");
         }

@@ -7,6 +7,9 @@ public class EnemyBehaviour : MonoBehaviour
     public float startSpeed = 10; //Initial speed of the enemy, set to 0 for stationary baddies
     public bool isActive; //Is the enemy active? Not applicaple to stationary baddies (they don't actually care)
 
+    [SerializeField]
+    protected GameObject killParticles;
+
     protected float speed; //Current speed of the enemy
     protected Rigidbody2D rb; //The enemy's rigidbody
     protected Vector3 initialPosition; //The enemy's starting position
@@ -62,5 +65,11 @@ public class EnemyBehaviour : MonoBehaviour
     public virtual void SetPosition(Vector3 pos)
     {
         initialPosition = pos;
+    }
+
+    public virtual void DeathAnim()
+    {
+        GameObject dustCloud = Instantiate(killParticles, transform.position, Quaternion.identity) as GameObject;
+        Destroy(dustCloud, 2f);
     }
 }
