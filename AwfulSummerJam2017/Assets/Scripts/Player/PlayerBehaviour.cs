@@ -49,8 +49,6 @@ public class PlayerBehaviour : MonoBehaviour
     private BottlePickup[] bottleCollectibles;
     [SerializeField]
     private Text bottleCountText; //The bottle count text............
-    [SerializeField]
-    private ParticleSystem killParticles;
 
     void Start()
     {
@@ -245,7 +243,16 @@ public class PlayerBehaviour : MonoBehaviour
     void EndSequence()
     {
         anim.SetBool("isRunning", false);
-        anim.SetBool("isIdle", true); //Set to Victory animation once we get it
+
+        if(bottles < minBottleReq)
+        {
+            anim.SetTrigger("isSad");
+        }
+        else
+        {
+            anim.SetTrigger("isHappy");
+        }
+
         foreach(PlatformMover plats in startPlatforms)
         {
             plats.PauseGame();
