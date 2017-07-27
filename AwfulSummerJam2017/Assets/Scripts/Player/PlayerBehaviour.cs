@@ -186,6 +186,7 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
+    //The even more mighty trigger detector, if this hits something, a whole slew of things happen!
     void OnTriggerEnter2D(Collider2D collider)
     {
         EnemyBehaviour enemy = collider.gameObject.GetComponent<EnemyBehaviour>();
@@ -201,15 +202,20 @@ public class PlayerBehaviour : MonoBehaviour
             collider.gameObject.SetActive(false);
         }
 
-        if(collider.tag == "PitStop")
+        if(collider.tag == "PitStop") //Sets the checkpoint if a pitstop is touched
         {
             SetCheckPoint();
         }
 
-        if(collider.tag == "Booze")
+        if(collider.tag == "Booze") //adds a Bottle of booze if you touch one
         {
             IncreaseBottles();
             collider.gameObject.SetActive(false);
+        }
+
+        if(collider.tag == "End")
+        {
+            EndSequence();
         }
     }
 
@@ -219,6 +225,23 @@ public class PlayerBehaviour : MonoBehaviour
         {
             pitStopTouched = false;
         }
+    }
+
+    void EndSequence()
+    {
+        anim.SetBool("isRunning", false);
+        anim.SetBool("isIdle", true); //Set to Victory animation once we get it
+        foreach(PlatformMover plats in startPlatforms)
+        {
+            plats.PauseGame();
+        }
+        foreach(EnemyBehaviour bads in enemies)
+        {
+            bads.StopMoving();
+        }
+
+        //TODO: Put the Iris transition here
+        //TODO: Call LevelManager to change the level
     }
 
     //Drink up, be merry, and also invincible for a couple of seconds (pits don't care if you're drunk)
@@ -300,7 +323,6 @@ public class PlayerBehaviour : MonoBehaviour
             {
                 anim.SetTrigger("isJumping");
                 rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-/*                IncreaseBottles(); // just testing*/
             }
         }
     }
@@ -362,7 +384,6 @@ public class PlayerBehaviour : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R)) //Set to something better
         {
             anim.SetTrigger("isPunching");
-            //TODO: Make a collider (or use the boozed up collider?) and use it
         }
     }
 
