@@ -6,6 +6,7 @@ public class BottleBehaviour : MonoBehaviour {
 
     public float speed;
     private Rigidbody2D rb; //The bottle's rigidbody
+    private GameObject dustParticle;
 
     void Start()
     {

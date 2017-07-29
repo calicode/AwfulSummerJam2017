@@ -27,6 +27,9 @@ public class PlayerBehaviour : MonoBehaviour
     private bool isPunching = false;
     private bool readyThrow = true;
     private bool pitStopTouched = false;
+    private bool gameEnd = false;
+    private SFXManager sfxManager;
+    private int jumpSFXNum;
 
     //Bunch of variables I want to see in editor but not change
     [SerializeField]
@@ -60,6 +63,8 @@ public class PlayerBehaviour : MonoBehaviour
         startPlatforms = GameObject.FindObjectsOfType<PlatformMover>();
         enemies = GameObject.FindObjectsOfType<EnemyBehaviour>();
         bottleCollectibles = GameObject.FindObjectsOfType<BottlePickup>();
+        sfxManager = GameObject.FindObjectOfType<SFXManager>();
+        jumpSFXNum = sfxManager.jumpSFX.Length;
 
         //Initializes the timer, count and position (Should this be in the Initialize function? TBD)
         boozeTimer = initBoozeTimer;
@@ -98,7 +103,7 @@ public class PlayerBehaviour : MonoBehaviour
                 ResetEverything(); //Three guesses as to what this does
             }
         }
-        else //This should be the default setting, when the game is running
+        else if(!gameEnd)//This should be the default setting, when the game is running
         {
             Jump(); //Lets you soar through the air without a care in the world
             Slide(); //Lets you slide real smooth like
@@ -118,7 +123,54 @@ public class PlayerBehaviour : MonoBehaviour
             }
 
         }
+        else
+        {
+            
+        }
 
+    }
+
+    void JumpSFX()
+    {
+        int randoJump = Random.Range(0, jumpSFXNum);
+        sfxManager.audioSource[0].clip = sfxManager.jumpSFX[randoJump];
+        sfxManager.audioSource[0].Play();
+    }
+
+    public void BonkSFX()
+    {
+        sfxManager.audioSource[1].clip = sfxManager.bonkSFX;
+        sfxManager.audioSource[1].Play();
+    }
+
+    void CheckPointSFX()
+    {
+        sfxManager.audioSource[2].clip = sfxManager.checkPointSFX;
+        sfxManager.audioSource[2].Play();
+    }
+
+    public void SlideSFX()
+    {
+        sfxManager.audioSource[4].clip = sfxManager.slideSFX;
+        sfxManager.audioSource[4].Play();
+    }
+
+    void PunchSFX()
+    {
+        sfxManager.audioSource[5].clip = sfxManager.punchSFX;
+        sfxManager.audioSource[5].Play();
+    }
+
+    void DrinkSFX()
+    {
+        sfxManager.audioSource[6].clip = sfxManager.drinkSFX;
+        sfxManager.audioSource[6].Play();
+    }
+
+    void ThrowSFX()
+    {
+        sfxManager.audioSource[7].clip = sfxManager.throwSFX;
+        sfxManager.audioSource[7].Play();
     }
 
     IEnumerator ResetThrow()
@@ -218,6 +270,7 @@ public class PlayerBehaviour : MonoBehaviour
         if(collider.tag == "PitStop") //Sets the checkpoint if a pitstop is touched
         {
             SetCheckPoint();
+            CheckPointSFX();
         }
 
         if(collider.tag == "Booze") //adds a Bottle of booze if you touch one
@@ -243,6 +296,8 @@ public class PlayerBehaviour : MonoBehaviour
     void EndSequence()
     {
         anim.SetBool("isRunning", false);
+
+        gameEnd = true;
 
         if(bottles < minBottleReq)
         {
@@ -273,6 +328,7 @@ public class PlayerBehaviour : MonoBehaviour
         {
             if(!boozedUp && bottles >= 5)
             {
+                DrinkSFX();
                 bottles -= 5;
                 UpdateBottleCountDisplay();
                 boozedUp = true;
@@ -325,6 +381,7 @@ public class PlayerBehaviour : MonoBehaviour
             colRunning.SetActive(false);
             colSliding.SetActive(true);
             isSliding = true;
+
         }
         else if (Input.GetButtonUp("Slide"))
         {
@@ -344,6 +401,7 @@ public class PlayerBehaviour : MonoBehaviour
             if (isGrounded)
             {
                 anim.SetTrigger("isJumping");
+                JumpSFX();
                 rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             }
         }
@@ -384,6 +442,7 @@ public class PlayerBehaviour : MonoBehaviour
                 if(bottles > 0)
                 {
                     anim.SetTrigger("isThrowing");
+                    ThrowSFX();
                     GameObject bottleProj = Instantiate(bottleThrown, throwingArm.position, Quaternion.identity) as GameObject;
                     bottles--;
                     UpdateBottleCountDisplay();
@@ -406,6 +465,7 @@ public class PlayerBehaviour : MonoBehaviour
         if (Input.GetButtonDown("Punch")) //Set to something better
         {
             anim.SetTrigger("isPunching");
+            PunchSFX();
         }
     }
 
@@ -468,6 +528,7 @@ public class PlayerBehaviour : MonoBehaviour
         colSliding.SetActive(false);
         colPunch.SetActive(false);
         gameStarted = false;
+        gameEnd = false;
         boozedUp = false;
         dead = false;
         transform.position = initPos;
