@@ -22,9 +22,22 @@ public class BottleBehaviour : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if(col.tag == "Obstacle")
+        EnemyBehaviour enemy = col.gameObject.GetComponent<EnemyBehaviour>();
+        ShooterBehaviour shooter = col.gameObject.GetComponent<ShooterBehaviour>();
+
+        if(enemy)
         {
+            enemy.DeathAnim();
             col.gameObject.SetActive(false);
+            Destroy(gameObject);
         }
+        else if(shooter)
+        {
+            shooter.DeathAnim();
+            col.gameObject.SetActive(false);
+            Destroy(gameObject);
+        }
+
+
     }
 }

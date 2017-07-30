@@ -57,6 +57,7 @@ public class EnemyBehaviour : MonoBehaviour
         transform.localPosition = initialPosition;
     }
 
+    //Getter and Setter for the Enemy Position
     public virtual Vector3 GetPosition()
     {
         return transform.localPosition;
@@ -67,6 +68,7 @@ public class EnemyBehaviour : MonoBehaviour
         initialPosition = pos;
     }
 
+    //Activates a particle effect when the enemy dies
     public virtual void DeathAnim()
     {
         GameObject dustCloud = Instantiate(killParticles, transform.position, Quaternion.identity) as GameObject;
