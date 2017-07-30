@@ -17,8 +17,8 @@ public class PlayerBehaviour : MonoBehaviour
     private float boozeTimer; //Current Booze Timer
     private int bottles; //Current Bottle count
     private Rigidbody2D rb; //The player's Rigidbody
-    [SerializeField] private Collider2D runCollider; //The player's running collider
-    [SerializeField] private Collider2D slideCollider; //the player's slide collider
+    [SerializeField] private CapsuleCollider2D runCollider; //The player's running collider
+    [SerializeField] private CapsuleCollider2D slideCollider; //the player's slide collider
     private Animator anim; //The Player's animator
     private bool gameStarted; //Is the game currently going?
     private bool boozedUp; //Is the player currently in Booze Power mode?
@@ -45,6 +45,10 @@ public class PlayerBehaviour : MonoBehaviour
     [SerializeField]
     private GameObject colPunch;
     [SerializeField]
+    private CapsuleCollider2D colTriggerRun;
+    [SerializeField]
+    private CapsuleCollider2D colTriggerSlide;
+    [SerializeField]
     private PlatformMover[] startPlatforms; //All the platforms currently in the scene
     [SerializeField]
     private EnemyBehaviour[] enemies; //All the enemies currently in the scene
@@ -57,8 +61,8 @@ public class PlayerBehaviour : MonoBehaviour
     {
         //Yeh git those components
         rb = GetComponent<Rigidbody2D>();
-        runCollider = colRunning.GetComponent<Collider2D>();
-        slideCollider = colSliding.GetComponent<Collider2D>();
+        runCollider = colRunning.GetComponent<CapsuleCollider2D>();
+        slideCollider = colSliding.GetComponent<CapsuleCollider2D>();
         anim = GetComponent<Animator>();
         startPlatforms = GameObject.FindObjectsOfType<PlatformMover>();
         enemies = GameObject.FindObjectsOfType<EnemyBehaviour>();
@@ -173,6 +177,12 @@ public class PlayerBehaviour : MonoBehaviour
         sfxManager.audioSource[7].Play();
     }
 
+    void PickupBottleSFX()
+    {
+        sfxManager.audioSource[8].clip = sfxManager.bottlePickupSFX;
+        sfxManager.audioSource[8].Play();
+    }
+
     IEnumerator ResetThrow()
     {
         yield return new WaitForSeconds(1f);
@@ -276,6 +286,7 @@ public class PlayerBehaviour : MonoBehaviour
         if(collider.tag == "Booze") //adds a Bottle of booze if you touch one
         {
             IncreaseBottles();
+            PickupBottleSFX();
             collider.gameObject.SetActive(false);
         }
 
@@ -380,6 +391,8 @@ public class PlayerBehaviour : MonoBehaviour
             anim.SetBool("isSliding", true);
             colRunning.SetActive(false);
             colSliding.SetActive(true);
+            colTriggerRun.enabled = false;
+            colTriggerSlide.enabled = true;
             isSliding = true;
 
         }
@@ -388,6 +401,8 @@ public class PlayerBehaviour : MonoBehaviour
             anim.SetBool("isSliding", false);
             colRunning.SetActive(true);
             colSliding.SetActive(false);
+            colTriggerRun.enabled = true;
+            colTriggerSlide.enabled = false;
             isSliding = false;
         }
     }
@@ -527,6 +542,8 @@ public class PlayerBehaviour : MonoBehaviour
         colBoozePower.SetActive(false);
         colSliding.SetActive(false);
         colPunch.SetActive(false);
+        colTriggerRun.enabled = true;
+        colTriggerSlide.enabled = false;
         gameStarted = false;
         gameEnd = false;
         boozedUp = false;

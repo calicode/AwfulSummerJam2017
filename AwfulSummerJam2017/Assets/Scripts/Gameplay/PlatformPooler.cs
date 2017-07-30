@@ -5,22 +5,25 @@ using UnityEngine;
 public class PlatformPooler : MonoBehaviour
 {
 
-    public int NumPlatsPerSection = 5; //Number of platforms per section
-    public GameObject pitStopPlatform; //The pitstop Platform
-    public GameObject endPlatform;
-    public List<GameObject> platforms; //The big ol' list o' platforms
 
-    private int platformIndex; //An incrementing number for platforms
-    private Vector3 lastPlatPos; //The position of the last platform spawned
-    private int sectionsNum = 2; //Number of sections per level
-    private Vector3 initPos; //The platform's initial position
+
+    public GameObject pitStopPlatform;
+    public GameObject endPlatform;
+
+    private List<GameObject> platforms;
+    private int NumPlatsPerSection = 5;
+    private int platformIndex; 
+    private Vector3 lastPlatPos; 
+    private int sectionsNum = 2; 
+    private Vector3 initPos;
 
     void Awake()
     {
-        platforms = new List<GameObject>(); //Creates a list of gameobjects for the platforms
-        initPos = Vector3.zero; //Resets the platform position to 0,0,0;
-        lastPlatPos = Vector3.zero; //Makes sure the last platform position is initialized to 0 at the start
-        platformIndex = 1; //Makes sure the platform index is set to 1 at the start
+        //Creates the list of platforms and initializes the platforms to zero and index to 1
+        platforms = new List<GameObject>();
+        initPos = Vector3.zero;
+        lastPlatPos = Vector3.zero;
+        platformIndex = 1;
 
         //Adds all the child platforms to the platform list
         foreach (Transform child in transform)
@@ -35,7 +38,8 @@ public class PlatformPooler : MonoBehaviour
             plat.transform.position = initPos;
         }
 
-        //There's gotta be a better way to write all this but whatever...spawns a set of platforms for the level
+        //There's gotta be a better way to write all this but whatever...
+        //spawns a set of platforms for the level
         SpawnPlatforms();
 
         while (sectionsNum > 0)

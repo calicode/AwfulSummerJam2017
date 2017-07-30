@@ -12,6 +12,7 @@ public class SFXManager : MonoBehaviour
     public AudioClip punchSFX;
     public AudioClip drinkSFX;
     public AudioClip throwSFX;
+    public AudioClip bottlePickupSFX;
 
     public AudioSource[] audioSource;
 }
