@@ -56,6 +56,12 @@ public class PlayerBehaviour : MonoBehaviour
     private BottlePickup[] bottleCollectibles;
     [SerializeField]
     private Text bottleCountText; //The bottle count text............
+    [SerializeField]
+    private GameObject startText;
+    [SerializeField]
+    private GameObject deathText;
+    [SerializeField]
+    private Text textPrompt;
 
     void Start()
     {
@@ -69,6 +75,9 @@ public class PlayerBehaviour : MonoBehaviour
         bottleCollectibles = GameObject.FindObjectsOfType<BottlePickup>();
         sfxManager = GameObject.FindObjectOfType<SFXManager>();
         jumpSFXNum = sfxManager.jumpSFX.Length;
+        startText.SetActive(true);
+        deathText.SetActive(false);
+        textPrompt.gameObject.SetActive(false);
 
         //Initializes the timer, count and position (Should this be in the Initialize function? TBD)
         boozeTimer = initBoozeTimer;
@@ -95,8 +104,10 @@ public class PlayerBehaviour : MonoBehaviour
 
         if (!gameStarted) //Checks to see if the game is set to "pause" mode
         {
+            PauseGame();
             if (Input.GetKeyDown(KeyCode.Space)) //Change keycode to something more appropriate once game is near completion
             {
+                startText.SetActive(false);
                 StartRunning(); //Starts the game!
             }
         }
@@ -183,11 +194,32 @@ public class PlayerBehaviour : MonoBehaviour
         sfxManager.audioSource[8].Play();
     }
 
+    IEnumerator TxtActivator()
+    {
+        textPrompt.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(2f);
+
+        textPrompt.gameObject.SetActive(false);
+    }
+
     IEnumerator ResetThrow()
     {
         yield return new WaitForSeconds(1f);
 
         readyThrow = true;
+    }
+
+    void PauseGame()
+    {
+        foreach(PlatformMover plats in startPlatforms)
+        {
+            plats.PauseGame();
+        }
+        foreach(EnemyBehaviour bads in enemies)
+        {
+            bads.StopMoving();
+        }
     }
 
     //This happens when you touch a thing
@@ -196,14 +228,7 @@ public class PlayerBehaviour : MonoBehaviour
         if(!dead)
         {
             anim.SetBool("isDead", true);
-            foreach(PlatformMover plats in startPlatforms)
-            {
-                plats.PauseGame();
-            }
-            foreach(EnemyBehaviour bads in enemies)
-            {
-                bads.StopMoving();
-            }
+            PauseGame();
             dead = true;
             isSliding = false;
             DecreaseBottles();
@@ -220,6 +245,12 @@ public class PlayerBehaviour : MonoBehaviour
     {
         colPunch.SetActive(false);
         isPunching = false;
+    }
+
+    public void ActivateTitleCard()
+    {
+        textPrompt.gameObject.SetActive(false);
+        deathText.SetActive(true);
     }
 
     //This is the function that puts the game in motion
@@ -347,7 +378,8 @@ public class PlayerBehaviour : MonoBehaviour
             }
             else if(bottles < 5)
             {
-                Debug.Log("Not enough booze!!");
+                textPrompt.text = "You're missing some hooch, fella!";
+                StartCoroutine(TxtActivator());
             }
         }
     }
@@ -380,6 +412,7 @@ public class PlayerBehaviour : MonoBehaviour
         }
 
         dead = false;
+        deathText.SetActive(false);
         Initialize();
     }
 
@@ -467,7 +500,8 @@ public class PlayerBehaviour : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("No more bottles!");
+                    textPrompt.text = "You're outta moonshine, ya goon!";
+                    StartCoroutine(TxtActivator());
                 }
             }
         }
@@ -490,7 +524,6 @@ public class PlayerBehaviour : MonoBehaviour
         if (bottles <= minBottleReq)
         {
             bottleCountText.color = Color.red;
-            //Add a pulsating thing to the text to INDICATE URGENCY!!!!!
         }
         else if (bottles <= 24)
         {
@@ -525,12 +558,14 @@ public class PlayerBehaviour : MonoBehaviour
                 }
                 bottles -= minBottleReq;
                 UpdateBottleCountDisplay();
-                Debug.Log("Reduced Bottles by " + minBottleReq);
+                textPrompt.text = "Checkpoint reached!\n Everything's Jake!";
+                StartCoroutine(TxtActivator());
 
             }
             else
             {
-                Debug.Log("Not enough bottles for this checkpoint!");
+                textPrompt.text = "Not enough coffin varnish\n for this checkpoint!";
+                StartCoroutine(TxtActivator());
             }
         }
     }
