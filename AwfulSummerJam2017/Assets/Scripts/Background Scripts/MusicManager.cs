@@ -36,6 +36,11 @@ public class MusicManager : MonoBehaviour
 
     }
 
+    void Start()
+    {
+
+    }
+
 
     public void OnLevelWasLoaded()
     {
@@ -85,12 +90,13 @@ public class MusicManager : MonoBehaviour
     {
         float prefsVolume = PlayerPrefs.GetFloat(PLAYER_PREFS_VOLUME);
 
-        if (prefsVolume <= 1.0f) { return prefsVolume; }
+
+        if (prefsVolume <= 1.0f && prefsVolume >= 0.1f) { return prefsVolume; }
         else
         {
-            Debug.Log("Playerprefs volume somehow got set too high, sending back default volume");
-            SetVolume(1.0f);
-            return 1.0f;
+            Debug.Log("Playerprefs volume somehow got set too high or is too low, sending back default volume.");
+            SetVolume(.5f);
+            return .5f;
         }
 
 
