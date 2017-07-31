@@ -106,6 +106,7 @@ public class PlatformPooler : MonoBehaviour
     }
 
     //Puts the platforms back in the pool
+    //Public function as it will be used in the Shredder script
     public void AddPlatformBack(GameObject platform)
     {
         platforms.Add(platform);
