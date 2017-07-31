@@ -13,6 +13,7 @@ public class PlayerBehaviour : MonoBehaviour
     public float initBoozeTimer = 5f; //set to private once testing is over  //Starting BoozeTimer
     public int minBottleReq = 10; //The minimal bottle requirement for the pitstop
 
+    private bool isWin = false;
     private Vector3 initPos; //Starting or checkpoint Player Position
     private float boozeTimer; //Current Booze Timer
     private int bottles; //Current Bottle count
@@ -30,6 +31,10 @@ public class PlayerBehaviour : MonoBehaviour
     private bool gameEnd = false;
     private SFXManager sfxManager;
     private int jumpSFXNum;
+    private PlatformMover[] startPlatforms; //All the platforms currently in the scene
+    private EnemyBehaviour[] enemies; //All the enemies currently in the scene
+    private BottlePickup[] bottleCollectibles;
+    private LevelManager levelMng;
 
     //Bunch of variables I want to see in editor but not change
     [SerializeField]
@@ -49,12 +54,6 @@ public class PlayerBehaviour : MonoBehaviour
     [SerializeField]
     private CapsuleCollider2D colTriggerSlide;
     [SerializeField]
-    private PlatformMover[] startPlatforms; //All the platforms currently in the scene
-    [SerializeField]
-    private EnemyBehaviour[] enemies; //All the enemies currently in the scene
-    [SerializeField]
-    private BottlePickup[] bottleCollectibles;
-    [SerializeField]
     private Text bottleCountText; //The bottle count text............
     [SerializeField]
     private GameObject startText;
@@ -62,6 +61,9 @@ public class PlayerBehaviour : MonoBehaviour
     private GameObject deathText;
     [SerializeField]
     private Text textPrompt;
+    [SerializeField]
+    private GameObject endScreen;
+    private Text endScreenTxt;
 
     void Start()
     {
@@ -74,9 +76,12 @@ public class PlayerBehaviour : MonoBehaviour
         enemies = GameObject.FindObjectsOfType<EnemyBehaviour>();
         bottleCollectibles = GameObject.FindObjectsOfType<BottlePickup>();
         sfxManager = GameObject.FindObjectOfType<SFXManager>();
+        endScreenTxt = endScreen.GetComponentInChildren<Text>();
+        levelMng = GameObject.FindObjectOfType<LevelManager>();
         jumpSFXNum = sfxManager.jumpSFX.Length;
         startText.SetActive(true);
         deathText.SetActive(false);
+        endScreen.SetActive(false);
         textPrompt.gameObject.SetActive(false);
 
         //Initializes the timer, count and position (Should this be in the Initialize function? TBD)
@@ -140,9 +145,25 @@ public class PlayerBehaviour : MonoBehaviour
         }
         else
         {
-            
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                if(isWin)
+                {
+                    if(SceneManager.GetActiveScene().buildIndex >= 3)
+                    {
+                        levelMng.LoadLevel("Endgame");
+                    }
+                    else
+                    {
+                        levelMng.LoadLevel(SceneManager.GetActiveScene().buildIndex + 1);
+                    }
+                }
+                else
+                {
+                    levelMng.LoadLevel(SceneManager.GetActiveScene().buildIndex);
+                }
+            }
         }
-
     }
 
     void JumpSFX()
@@ -203,6 +224,15 @@ public class PlayerBehaviour : MonoBehaviour
         textPrompt.gameObject.SetActive(false);
     }
 
+    IEnumerator EndTitleCard()
+    {
+        yield return new WaitForSeconds(2f);
+
+        endScreen.SetActive(true);
+
+        yield return new WaitForSeconds(2f);
+    }
+
     IEnumerator ResetThrow()
     {
         yield return new WaitForSeconds(1f);
@@ -247,7 +277,7 @@ public class PlayerBehaviour : MonoBehaviour
         isPunching = false;
     }
 
-    public void ActivateTitleCard()
+    public void ActivateDeathTitleCard()
     {
         textPrompt.gameObject.SetActive(false);
         deathText.SetActive(true);
@@ -343,11 +373,17 @@ public class PlayerBehaviour : MonoBehaviour
 
         if(bottles < minBottleReq)
         {
+            isWin = false;
             anim.SetTrigger("isSad");
+            endScreenTxt.text = "You big palooka!\nYou only got " + bottles.ToString() + " and you needed " + minBottleReq.ToString() + "!\n Try again!";
+            StartCoroutine(EndTitleCard());
         }
         else
         {
+            isWin = true;
             anim.SetTrigger("isHappy");
+            endScreenTxt.text = "Attaboy!\nYou brought " + bottles.ToString() + " more\n bottles for the speakeasy!\nYou're sitting pretty!";
+            StartCoroutine(EndTitleCard());
         }
 
         foreach(PlatformMover plats in startPlatforms)
