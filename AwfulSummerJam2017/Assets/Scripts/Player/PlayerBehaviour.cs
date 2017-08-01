@@ -123,7 +123,7 @@ public class PlayerBehaviour : MonoBehaviour
                 ResetEverything(); //Three guesses as to what this does
             }
         }
-        else if(!gameEnd)//This should be the default setting, when the game is running
+        else if (!gameEnd)//This should be the default setting, when the game is running
         {
             Jump(); //Lets you soar through the air without a care in the world
             Slide(); //Lets you slide real smooth like
@@ -145,11 +145,11 @@ public class PlayerBehaviour : MonoBehaviour
         }
         else
         {
-            if(Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                if(isWin)
+                if (isWin)
                 {
-                    if(SceneManager.GetActiveScene().buildIndex >= 3)
+                    if (SceneManager.GetActiveScene().name.Contains("Level 3"))
                     {
                         levelMng.LoadLevel("Endgame");
                     }
@@ -242,11 +242,11 @@ public class PlayerBehaviour : MonoBehaviour
 
     void PauseGame()
     {
-        foreach(PlatformMover plats in startPlatforms)
+        foreach (PlatformMover plats in startPlatforms)
         {
             plats.PauseGame();
         }
-        foreach(EnemyBehaviour bads in enemies)
+        foreach (EnemyBehaviour bads in enemies)
         {
             bads.StopMoving();
         }
@@ -255,7 +255,7 @@ public class PlayerBehaviour : MonoBehaviour
     //This happens when you touch a thing
     public void Dead()
     {
-        if(!dead)
+        if (!dead)
         {
             anim.SetBool("isDead", true);
             PauseGame();
@@ -318,11 +318,11 @@ public class PlayerBehaviour : MonoBehaviour
 
         if ((enemy || bullet || shooter) && boozedUp) //Destroys ALL obstacles if you're boozed up
         {
-            if(enemy)
+            if (enemy)
             {
                 enemy.DeathAnim();
             }
-            else if(shooter)
+            else if (shooter)
             {
                 shooter.DeathAnim();
             }
@@ -331,27 +331,27 @@ public class PlayerBehaviour : MonoBehaviour
 
 
         }
-        else if(shooter && !boozedUp && isPunching) //Destroys only shooters when punching
+        else if (shooter && !boozedUp && isPunching) //Destroys only shooters when punching
         {
             shooter.DeathAnim();
             collider.gameObject.SetActive(false);
 
         }
 
-        if(collider.tag == "PitStop") //Sets the checkpoint if a pitstop is touched
+        if (collider.tag == "PitStop") //Sets the checkpoint if a pitstop is touched
         {
             SetCheckPoint();
             CheckPointSFX();
         }
 
-        if(collider.tag == "Booze") //adds a Bottle of booze if you touch one
+        if (collider.tag == "Booze") //adds a Bottle of booze if you touch one
         {
             IncreaseBottles();
             PickupBottleSFX();
             collider.gameObject.SetActive(false);
         }
 
-        if(collider.tag == "End")
+        if (collider.tag == "End")
         {
             EndSequence();
         }
@@ -359,7 +359,7 @@ public class PlayerBehaviour : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D collider)
     {
-        if(pitStopTouched)
+        if (pitStopTouched)
         {
             pitStopTouched = false;
         }
@@ -371,7 +371,7 @@ public class PlayerBehaviour : MonoBehaviour
 
         gameEnd = true;
 
-        if(bottles < minBottleReq)
+        if (bottles < minBottleReq)
         {
             isWin = false;
             anim.SetTrigger("isSad");
@@ -386,11 +386,11 @@ public class PlayerBehaviour : MonoBehaviour
             StartCoroutine(EndTitleCard());
         }
 
-        foreach(PlatformMover plats in startPlatforms)
+        foreach (PlatformMover plats in startPlatforms)
         {
             plats.PauseGame();
         }
-        foreach(EnemyBehaviour bads in enemies)
+        foreach (EnemyBehaviour bads in enemies)
         {
             bads.StopMoving();
         }
@@ -402,9 +402,9 @@ public class PlayerBehaviour : MonoBehaviour
     //Drink up, be merry, and also invincible for a couple of seconds (pits don't care if you're drunk)
     void ActivateBoozePower()
     {
-        if(Input.GetButtonDown("BoozeUp"))
+        if (Input.GetButtonDown("BoozeUp"))
         {
-            if(!boozedUp && bottles >= 5)
+            if (!boozedUp && bottles >= 5)
             {
                 DrinkSFX();
                 bottles -= 5;
@@ -412,7 +412,7 @@ public class PlayerBehaviour : MonoBehaviour
                 boozedUp = true;
                 colBoozePower.SetActive(true);
             }
-            else if(bottles < 5)
+            else if (bottles < 5)
             {
                 textPrompt.text = "You're missing some hooch, fella!";
                 StartCoroutine(TxtActivator());
@@ -442,7 +442,7 @@ public class PlayerBehaviour : MonoBehaviour
             bads.gameObject.SetActive(true);
         }
 
-        foreach(BottlePickup collBottles in bottleCollectibles)
+        foreach (BottlePickup collBottles in bottleCollectibles)
         {
             collBottles.gameObject.SetActive(true);
         }
@@ -521,9 +521,9 @@ public class PlayerBehaviour : MonoBehaviour
     {
         if (Input.GetButtonDown("Throw")) //Set to something better
         {
-            if(!isSliding && readyThrow)
+            if (!isSliding && readyThrow)
             {
-                if(bottles > 0)
+                if (bottles > 0)
                 {
                     anim.SetTrigger("isThrowing");
                     ThrowSFX();
@@ -576,18 +576,18 @@ public class PlayerBehaviour : MonoBehaviour
 
     void SetCheckPoint()
     {
-        if(!pitStopTouched)
+        if (!pitStopTouched)
         {
             pitStopTouched = true;
 
-            if(bottles >= 10)
+            if (bottles >= 10)
             {
-                foreach(PlatformMover plats in startPlatforms)
+                foreach (PlatformMover plats in startPlatforms)
                 {
                     Vector3 newPos = plats.GetPlatPosition();
                     plats.SetPlatPosition(newPos - new Vector3(7, 0, 0));
                 }
-                foreach(EnemyBehaviour bads in enemies)
+                foreach (EnemyBehaviour bads in enemies)
                 {
                     Vector3 newPos = bads.GetPosition();
                     bads.SetPosition(newPos);
