@@ -46,7 +46,7 @@ public class FadeIn : MonoBehaviour
             yield return null;
         }
 
-        yield return new WaitForSecondsRealtime(5f);
+        yield return new WaitForSecondsRealtime(2f);
 
         LoadLevel();
     }
