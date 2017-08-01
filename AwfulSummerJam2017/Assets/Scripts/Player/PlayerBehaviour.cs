@@ -597,7 +597,7 @@ public class PlayerBehaviour : MonoBehaviour
                     Vector3 newPos = bads.GetPosition();
                     bads.SetPosition(newPos);
                 }
-                bottles -= minBottleReq;
+                bottles -= 10;
                 UpdateBottleCountDisplay();
                 textPrompt.text = "Checkpoint reached!\n Everything's Jake!";
                 StartCoroutine(TxtActivator());
