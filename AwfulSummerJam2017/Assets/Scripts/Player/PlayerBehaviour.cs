@@ -63,6 +63,8 @@ public class PlayerBehaviour : MonoBehaviour
     private Text textPrompt;
     [SerializeField]
     private GameObject endScreen;
+    [SerializeField]
+    private GameObject enemyActivation;
     private Text endScreenTxt;
 
     void Start()
@@ -83,6 +85,7 @@ public class PlayerBehaviour : MonoBehaviour
         deathText.SetActive(false);
         endScreen.SetActive(false);
         textPrompt.gameObject.SetActive(false);
+        enemyActivation.SetActive(true);
 
         //Initializes the timer, count and position (Should this be in the Initialize function? TBD)
         boozeTimer = initBoozeTimer;
@@ -250,6 +253,7 @@ public class PlayerBehaviour : MonoBehaviour
         {
             bads.StopMoving();
         }
+        enemyActivation.SetActive(false);
     }
 
     //This happens when you touch a thing
@@ -289,6 +293,7 @@ public class PlayerBehaviour : MonoBehaviour
         anim.SetBool("isIdle", false);
         anim.SetBool("isRunning", true);
         gameStarted = true;
+        enemyActivation.SetActive(true);
 
         foreach (PlatformMover plats in startPlatforms)
         {
