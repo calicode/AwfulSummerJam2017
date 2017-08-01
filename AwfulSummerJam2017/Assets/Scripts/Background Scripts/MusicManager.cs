@@ -26,7 +26,8 @@ public class MusicManager : MonoBehaviour
 
         else
         {
-            instance = this; DontDestroyOnLoad(gameObject);
+            instance = this; 
+            DontDestroyOnLoad(gameObject);
         }
 
 
@@ -35,12 +36,6 @@ public class MusicManager : MonoBehaviour
         PlayMusicTrack(SceneManager.GetActiveScene().buildIndex); // only needed for testing so main menu has a song. can remove in final build
 
     }
-
-    void Start()
-    {
-
-    }
-
 
     public void OnLevelWasLoaded()
     {
