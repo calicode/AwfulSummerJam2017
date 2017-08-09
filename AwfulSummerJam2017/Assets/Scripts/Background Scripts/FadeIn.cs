@@ -18,11 +18,22 @@ public class FadeIn : MonoBehaviour
 
     }
 
-
-
     void Update()
     {
-        
+        if(Input.GetButtonDown("Submit"))
+        {
+            Continue();
+        }
+    }
+
+    public void Continue()
+    {
+        StartCoroutine(FadeOutImage());
+    }
+
+    void StartPlaying()
+    {
+        lvlmanager.LoadLevel("Level 1");
     }
 
     IEnumerator FadeInImage()
@@ -35,7 +46,6 @@ public class FadeIn : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(5f);
 
-        StartCoroutine(FadeOutImage());
     }
 
     IEnumerator FadeOutImage()
@@ -48,12 +58,7 @@ public class FadeIn : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(2f);
 
-        LoadLevel();
-    }
+        StartPlaying();
 
-    void LoadLevel()
-    {
-        lvlmanager.LoadLevel("Level 1");
     }
-
 }

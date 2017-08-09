@@ -27,7 +27,6 @@ public class PlayerBehaviour : MonoBehaviour
     private bool isSliding = false;
     private bool isPunching = false;
     private bool readyThrow = true;
-    private bool pitStopTouched = false;
     private bool gameEnd = false;
     private SFXManager sfxManager;
     private int jumpSFXNum;
@@ -222,7 +221,7 @@ public class PlayerBehaviour : MonoBehaviour
     {
         textPrompt.gameObject.SetActive(true);
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(5f);
 
         textPrompt.gameObject.SetActive(false);
     }
@@ -362,14 +361,6 @@ public class PlayerBehaviour : MonoBehaviour
         }
     }
 
-    void OnTriggerExit2D(Collider2D collider)
-    {
-        if (pitStopTouched)
-        {
-            pitStopTouched = false;
-        }
-    }
-
     void EndSequence()
     {
         anim.SetBool("isRunning", false);
@@ -409,15 +400,15 @@ public class PlayerBehaviour : MonoBehaviour
     {
         if (Input.GetButtonDown("BoozeUp"))
         {
-            if (!boozedUp && bottles >= 5)
+            if (!boozedUp && bottles >= 10)
             {
                 DrinkSFX();
-                bottles -= 5;
+                bottles -= 10;
                 UpdateBottleCountDisplay();
                 boozedUp = true;
                 colBoozePower.SetActive(true);
             }
-            else if (bottles < 5)
+            else if (bottles < 10)
             {
                 textPrompt.text = "You're missing some hooch, fella!";
                 StartCoroutine(TxtActivator());
@@ -581,34 +572,20 @@ public class PlayerBehaviour : MonoBehaviour
 
     void SetCheckPoint()
     {
-        if (!pitStopTouched)
+        foreach(PlatformMover plats in startPlatforms)
         {
-            pitStopTouched = true;
-
-            if (bottles >= 10)
-            {
-                foreach (PlatformMover plats in startPlatforms)
-                {
-                    Vector3 newPos = plats.GetPlatPosition();
-                    plats.SetPlatPosition(newPos - new Vector3(7, 0, 0));
-                }
-                foreach (EnemyBehaviour bads in enemies)
-                {
-                    Vector3 newPos = bads.GetPosition();
-                    bads.SetPosition(newPos);
-                }
-                bottles -= 10;
-                UpdateBottleCountDisplay();
-                textPrompt.text = "Checkpoint reached!\n Everything's Jake!";
-                StartCoroutine(TxtActivator());
-
-            }
-            else
-            {
-                textPrompt.text = "Not enough coffin varnish\n for this checkpoint!";
-                StartCoroutine(TxtActivator());
-            }
+            Vector3 newPos = plats.GetPlatPosition();
+            plats.SetPlatPosition(newPos - new Vector3(7, 0, 0));
         }
+        foreach(EnemyBehaviour bads in enemies)
+        {
+            Vector3 newPos = bads.GetPosition();
+            bads.SetPosition(newPos);
+        }
+
+        textPrompt.text = "Checkpoint reached!\n Everything's Jake!";
+        StartCoroutine(TxtActivator());
+
     }
 
     //Sets all the colliders, animations, positions and conditions for the player back to normal.

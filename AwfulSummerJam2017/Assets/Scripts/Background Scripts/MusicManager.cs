@@ -45,27 +45,26 @@ public class MusicManager : MonoBehaviour
 
     public void PlayMusicTrack(int sceneIndex)
     {
-
         AudioClip clip = musicArray[sceneIndex];
 
         if (clip)
         {
-            if (audioSource.isPlaying && clip.name == audioSource.clip.name) { return; } // if its the same song don't start playing it again. This is so title screen music transitions to first level without interruption. 
+            if (audioSource.isPlaying && clip.name == audioSource.clip.name) 
+            {
+                return; // if its the same song don't start playing it again. This is so title screen music transitions to first level without interruption. 
+            } 
 
             audioSource.clip = clip;
             audioSource.PlayDelayed(1f);
             audioSource.loop = true;
 
         }
-        else { Debug.Log("No clip in MusicManager's musicArray for this scene. Add clip or just ignore this"); }
+        else
+        {
+            Debug.LogWarning("No clip in MusicManager's musicArray for this scene. Add clip or just ignore this"); 
+        }
 
     }
-
-
-
-
-
-
 
     // set by SetMusicVolume script which is on main menu canvas. 
 
@@ -77,7 +76,10 @@ public class MusicManager : MonoBehaviour
             PlayerPrefs.SetFloat(PLAYER_PREFS_VOLUME, newVolume);
             audioSource.volume = GetVolume();
         }
-        else { Debug.Log("Tried to set volume too high, this shouldn't appear"); }
+        else 
+        { 
+            Debug.LogWarning("Tried to set volume too high, this shouldn't appear"); 
+        }
 
     }
 
@@ -86,19 +88,15 @@ public class MusicManager : MonoBehaviour
         float prefsVolume = PlayerPrefs.GetFloat(PLAYER_PREFS_VOLUME);
 
 
-        if (prefsVolume <= 1.0f && prefsVolume >= 0.1f) { return prefsVolume; }
+        if (prefsVolume <= 1.0f && prefsVolume >= 0f) 
+        {
+            return prefsVolume;
+        }
         else
         {
-            Debug.Log("Playerprefs volume somehow got set too high or is too low, sending back default volume.");
-            SetVolume(.5f);
-            return .5f;
+            Debug.LogWarning("Playerprefs volume somehow got set too high or is too low, sending back default volume.");
+            SetVolume(0f);
+            return 0;
         }
-
-
-
     }
-
-
-
-
 }
