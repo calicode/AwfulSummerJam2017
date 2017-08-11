@@ -95,7 +95,7 @@ public class PlayerBehaviour : MonoBehaviour
         Initialize(); //Resets animations to Idle and pauses the game until StartGame input
     }
 
-    void Update()
+    void FixedUpdate()
     {
         //What is ground????? This checks to see if the player is touching it!    
         if (!isSliding)
@@ -109,6 +109,11 @@ public class PlayerBehaviour : MonoBehaviour
 
         anim.SetBool("isGrounded", isGrounded); //Makes sure the animations go back to normal if the player touches the ground
 
+    }
+
+    void Update()
+    {
+        
         if (!gameStarted) //Checks to see if the game is set to "pause" mode
         {
             PauseGame();
@@ -555,7 +560,7 @@ public class PlayerBehaviour : MonoBehaviour
     {
         if (bottles <= minBottleReq)
         {
-            bottleCountText.color = Color.red;
+            bottleCountText.color = new Color32(200, 0, 0, 255);
         }
         else if (bottles <= 24)
         {
@@ -563,7 +568,7 @@ public class PlayerBehaviour : MonoBehaviour
         }
         else if (bottles > 24)
         {
-            bottleCountText.color = Color.green;
+            bottleCountText.color = new Color32(114, 180, 80, 255);
         }
 
         bottleCountText.text = bottles.ToString();
