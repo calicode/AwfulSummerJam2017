@@ -36,6 +36,9 @@ public class PlayerBehaviour : MonoBehaviour
     private LevelManager levelMng;
 
     //Bunch of variables I want to see in editor but not change
+
+
+
     [SerializeField]
     private GameObject bottleThrown;
     [SerializeField]
@@ -66,8 +69,13 @@ public class PlayerBehaviour : MonoBehaviour
     private GameObject enemyActivation;
     private Text endScreenTxt;
 
+    int obstacleCount;
+
     void Start()
     {
+
+        obstacleCount = GameObject.FindGameObjectsWithTag("Obstacle").Length;
+        Debug.Log("Obstacle count is " + obstacleCount);
         //Yeh git those components
         rb = GetComponent<Rigidbody2D>();
         runCollider = colRunning.GetComponent<CapsuleCollider2D>();
@@ -113,7 +121,7 @@ public class PlayerBehaviour : MonoBehaviour
 
     void Update()
     {
-        
+
         if (!gameStarted) //Checks to see if the game is set to "pause" mode
         {
             PauseGame();
@@ -577,12 +585,12 @@ public class PlayerBehaviour : MonoBehaviour
 
     void SetCheckPoint()
     {
-        foreach(PlatformMover plats in startPlatforms)
+        foreach (PlatformMover plats in startPlatforms)
         {
             Vector3 newPos = plats.GetPlatPosition();
             plats.SetPlatPosition(newPos - new Vector3(7, 0, 0));
         }
-        foreach(EnemyBehaviour bads in enemies)
+        foreach (EnemyBehaviour bads in enemies)
         {
             Vector3 newPos = bads.GetPosition();
             bads.SetPosition(newPos);
