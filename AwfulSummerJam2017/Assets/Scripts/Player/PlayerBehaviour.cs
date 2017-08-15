@@ -34,6 +34,7 @@ public class PlayerBehaviour : MonoBehaviour
     private EnemyBehaviour[] enemies; //All the enemies currently in the scene
     private BottlePickup[] bottleCollectibles;
     private LevelManager levelMng;
+    private ScoreMaster scoreMaster;
 
     //Bunch of variables I want to see in editor but not change
 
@@ -69,13 +70,10 @@ public class PlayerBehaviour : MonoBehaviour
     private GameObject enemyActivation;
     private Text endScreenTxt;
 
-    int obstacleCount;
 
     void Start()
     {
 
-        obstacleCount = GameObject.FindGameObjectsWithTag("Obstacle").Length;
-        Debug.Log("Obstacle count is " + obstacleCount);
         //Yeh git those components
         rb = GetComponent<Rigidbody2D>();
         runCollider = colRunning.GetComponent<CapsuleCollider2D>();
@@ -87,6 +85,7 @@ public class PlayerBehaviour : MonoBehaviour
         sfxManager = GameObject.FindObjectOfType<SFXManager>();
         endScreenTxt = endScreen.GetComponentInChildren<Text>();
         levelMng = GameObject.FindObjectOfType<LevelManager>();
+        scoreMaster = GameObject.FindObjectOfType<ScoreMaster>();
         jumpSFXNum = sfxManager.jumpSFX.Length;
         startText.SetActive(true);
         deathText.SetActive(false);
@@ -376,6 +375,7 @@ public class PlayerBehaviour : MonoBehaviour
 
     void EndSequence()
     {
+        Debug.Log("End sequence called, this should only show once per stage");
         anim.SetBool("isRunning", false);
 
         gameEnd = true;
@@ -392,6 +392,7 @@ public class PlayerBehaviour : MonoBehaviour
             isWin = true;
             anim.SetTrigger("isHappy");
             endScreenTxt.text = "Attaboy!\nYou brought " + bottles.ToString() + " more\n bottles for the speakeasy!\nYou're sitting pretty!";
+            scoreMaster.AddToCurrentScore(bottles);
             StartCoroutine(EndTitleCard());
         }
 
@@ -503,11 +504,10 @@ public class PlayerBehaviour : MonoBehaviour
     //Increases your booze count
     void IncreaseBottles()
     {
-        if (bottles < 30)
-        {
-            bottles++;
-            UpdateBottleCountDisplay();
-        }
+
+        bottles++;
+        UpdateBottleCountDisplay();
+
     }
 
     //Remove bottles when you're hit
